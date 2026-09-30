@@ -1,30 +1,36 @@
 # CLAUDE.md
 
-分割払い計算アプリ（macOS / iPadOS、SwiftUI）。仕様書は `docs/spec.md`。
+分割払い計算アプリ。ブラウザで動くWebアプリ（Mac の Safari/Chrome、iPad の Safari）。仕様書は `docs/spec.md`。
+当初は SwiftUI で作ったが、利用者の Mac で Xcode が使えないため Web 版に切り替えた（Swift 版は git 履歴のコミット 7a5061c にある）。
 
 ## 構成
 
-- `InstallmentKit/` … UIに依存しない共通コード（Swift Package）。Linuxでもビルド・テストできる。
-  - `Calculator/` 計算ロジック（`Calculator`, `LoanForm`, モデル）
-  - `Settings/` 設定の読み書き（`AppSettings`, `SettingsStore`, `RateField`）
-  - `Templating/` HTMLテンプレートへの差し込み（`TemplateRenderer`, `TemplateContext`, `TemplateLibrary`）
-  - `Resources/default.html` 同梱の既定テンプレート
-- `App/` … SwiftUIアプリ本体（macOS・iPadOS共通）。`Views/`, `PDFExport/`, `AppModel.swift`
-- `project.yml` … XcodeGen の設定（`xcodegen generate` で .xcodeproj を作る）
+- `web/` … アプリ本体。ビルド不要で、`web/index.html` をそのまま開いても動く（classic script のみ、ES modules は使わない）
+  - `js/core.js` 計算・入力の解釈・書式・テンプレート差し込み・設定の検証（DOMに依存しない。Node からも require できる）
+  - `js/default-template.js` 同梱の既定テンプレート（file:// でも読めるよう JS の文字列で持つ）
+  - `js/app.js` 画面の処理
+  - `css/app.css`、`manifest.webmanifest`、`sw.js`（https で公開したときのオフライン対応）、`icons/`
+- `tests/core.test.js` … `core.js` と既定テンプレートのテスト（Node 標準の node:test）
+- `scripts/build-single.js` … `web/` を1ファイルにまとめて `dist/installment-calculator.html` を作る
+- `dist/` … 配布用の1ファイル版（コミットしておく）
 
 ## コマンド
 
 ```sh
-cd InstallmentKit && swift test     # 計算・設定・テンプレートのユニットテスト
-xcodegen generate                   # Xcodeプロジェクト生成（Mac）
+npm test         # テスト
+npm run build    # dist/installment-calculator.html を作り直す
 ```
 
-計算ロジックを変えたら必ず `swift test` を通すこと。
+- 計算ロジックを変えたら必ず `npm test` を通すこと。
+- `web/` を変えたら `npm run build` で `dist/` も更新してコミットすること。
+- `web/` のファイルを変えたら `web/sw.js` の `VERSION` を上げること（公開版のキャッシュ更新のため）。
+- 外部のライブラリ・CDN・通信は使わない（オフラインで動くこと、患者情報を外に出さないため）。
 
 ## 重要な決めごと（変更するときは仕様書と合わせて相談）
 
 ### 計算
 - 返済方式は**元利均等**。月利 r = 年率 ÷ 100 ÷ 12。日割りはしない。
+- 年率は 1/10000 % 単位の BigInt で持ち、利息 = 残高 × 年率 ÷ 1200 を整数演算で丸める（浮動小数の誤差を出さない）。小数は4桁まで。
 - 毎月: 利息 = 残高 × r（円未満は端数処理ルール）→ 元本充当 = 支払額 − 利息 → 残高を減らす。
   ボーナスの有無にかかわらず、スケジュールは同じ月次シミュレーションで作る。
 - 端数処理の既定は**切り捨て**（設定で切り上げ／四捨五入に変更可）。利息と月額の両方に同じルールを使う。
@@ -35,19 +41,20 @@ xcodegen generate                   # Xcodeプロジェクト生成（Mac）
 - 年率の上限は30%（それを超えると入力ミスとしてエラー）。
 
 ### 利息の非表示（ブラインド）
-- 起動時は利息総額を伏せる（`interestMaskText`、既定「●●●」）。ボタンで表示／非表示を切り替える。
-- **入力を変えて再計算し、結果が変わったら自動で伏せ直す**（`AppModel.recalculate`）。
+- 起動時は利息総額を伏せる（設定 `interestMask`、既定「●●●」）。ボタンで表示／非表示を切り替える。
+- **入力を変えて再計算し、結果が変わったら自動で伏せ直す**（`app.js` の `recalc`）。患者名の変更では伏せ直さない。
 - スケジュール表の利息列も同じ状態に従う。
-- 支払い表の出力では「利息を表示する」を選んだときだけ利息を出す（既定はオフ）。オフのときは `data-show="interest"` の要素を除去し、`{{total_interest}}` / `{{row.interest}}` は空になる。
+- 支払い表の出力では「利息を表示する」を選んだときだけ利息を出す（既定はオフ、出力画面を開くたびにオフに戻す）。オフのときは `data-show="interest"` の要素を除去し、`{{total_interest}}` / `{{row.interest}}` は空になる。
 
 ### 年率の既定値
-- 設定の `defaultAnnualRatePercent` を起動時に入力欄へ入れる。入力欄を変えても既定値は変わらない。
+- 設定の `defaultRate`（文字列）を起動時に入力欄へ入れる。入力欄を変えても既定値は変わらない。
 - 「この値を既定にする」を押したときだけ保存する。既定値と違うときは強調色と注意書きで示す。
 
 ### 個人情報
-- 患者名・支払総額などの入力は**保存しない**（メモリ上のみ、`@AppStorage`/`@SceneStorage` も使わない）。
-- 設定ファイルに患者に関する項目を追加しないこと。
-- 共有用の一時PDFは出力画面を閉じたら削除する。PDFの保存先は利用者が選ぶ。
+- 患者名・支払総額などの入力は**保存しない**（メモリ上のみ。localStorage に入れるのは設定だけ）。再読み込みで消える。
+- 設定に患者に関する項目を追加しないこと。
+- 出力画面を閉じたらプレビューを消す。PDFの保存先は利用者が印刷画面で選ぶ。
 
 ### 見た目
-- 色・フォント・文字サイズ・文言は `AppSettings` から読み込み（`Theme`）、Viewにベタ書きしない。
+- 色・フォント・文字サイズ・文言は設定から読み込み、CSS変数（`--primary` など）に入れる。Viewにベタ書きしない。
+- iPad で使うので、ボタン・入力欄の高さは 44px 以上。900px 未満では入力と結果を上下に並べる。

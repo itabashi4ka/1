@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+/* 同梱の既定テンプレート（支払い表）。ローカルファイルで開いても読めるよう JS の文字列で持つ。 */
+(function (root) {
+  const DEFAULT_TEMPLATE = `<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
@@ -33,6 +35,11 @@
   table.schedule td.c { text-align: center; }
   table.schedule tr { page-break-inside: avoid; }
   thead { display: table-header-group; }
+  /* 画面で見るとき（プレビュー）は用紙のように表示する。印刷には影響しない */
+  @media screen {
+    html { background: #e9edef; }
+    body { max-width: 210mm; margin: 16px auto; padding: 14mm 12mm; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+  }
   .note { margin-top: 14px; font-size: 9pt; color: #555; border-left: 3px solid {{accent_color}}; padding-left: 8px; }
 </style>
 </head>
@@ -91,3 +98,7 @@
   <p class="note">{{note}}</p>
 </body>
 </html>
+`;
+  if (typeof module === 'object' && module.exports) module.exports = DEFAULT_TEMPLATE;
+  else root.DEFAULT_TEMPLATE = DEFAULT_TEMPLATE;
+})(typeof self !== 'undefined' ? self : this);

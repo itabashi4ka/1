@@ -1,0 +1,9 @@
+{
+  "name": "installment-calculator",
+  "private": true,
+  "description": "分割払い計算（ブラウザで動くWebアプリ）",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "build": "node scripts/build-single.js"
+  }
+}

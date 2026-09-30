@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>分割払い計算</title>
+<meta name="description" content="分割払いの月額・回数を計算し、支払い表を印刷・PDF保存します。入力内容は保存・送信しません。">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="分割払い計算">
+<meta name="theme-color" content="#2F6F8F">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="appbar">
+  <h1>分割払い計算</h1>
+  <div class="appbar-actions">
+    <button type="button" id="btn-clear" title="次の患者に備えて入力をすべて消します">入力をクリア</button>
+    <button type="button" id="btn-export" class="primary" disabled>支払い表を出力</button>
+    <button type="button" id="btn-settings">設定</button>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- 入力エリア -->
+  <section class="panel input-panel" aria-label="入力">
+    <div class="segmented" role="radiogroup" aria-label="計算モード">
+      <label><input type="radio" name="mode" value="payment"><span>① 月額から</span></label>
+      <label><input type="radio" name="mode" value="installments" checked><span>② 回数から</span></label>
+    </div>
+
+    <label class="field">
+      <span class="field-label">支払総額（税込）</span>
+      <span class="field-control"><input id="principal" type="text" inputmode="numeric" autocomplete="off" placeholder="1,000,000"><span class="unit">円</span></span>
+    </label>
+
+    <div class="field">
+      <label class="field-label" for="rate">年率</label>
+      <span class="field-control"><input id="rate" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="unit">%</span></span>
+      <div class="rate-status" id="rate-status">
+        <span class="rate-message" id="rate-message"></span>
+        <span class="rate-buttons" id="rate-buttons">
+          <button type="button" class="small" id="btn-rate-reset">既定に戻す</button>
+          <button type="button" class="small" id="btn-rate-default">この値を既定にする</button>
+        </span>
+      </div>
+    </div>
+
+    <label class="field" data-mode="installments">
+      <span class="field-label">分割回数</span>
+      <span class="field-control"><input id="installments" type="text" inputmode="numeric" autocomplete="off" placeholder="36"><span class="unit">回</span></span>
+    </label>
+
+    <label class="field" data-mode="payment" hidden>
+      <span class="field-label" id="payment-label">月額</span>
+      <span class="field-control"><input id="payment" type="text" inputmode="numeric" autocomplete="off" placeholder="30,000"><span class="unit">円</span></span>
+    </label>
+
+    <div class="field">
+      <label class="switch"><input type="checkbox" id="bonus-enabled"><span>ボーナス払い</span></label>
+      <div id="bonus-fields" hidden>
+        <label class="field">
+          <span class="field-label">ボーナス月の加算額</span>
+          <span class="field-control"><input id="bonus-amount" type="text" inputmode="numeric" autocomplete="off" placeholder="50,000"><span class="unit">円</span></span>
+        </label>
+        <span class="field-label">ボーナス月</span>
+        <div class="months" id="bonus-months" role="group" aria-label="ボーナス月"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">初回支払月</span>
+      <span class="field-control">
+        <select id="first-year" aria-label="初回支払月（年）"></select>
+        <select id="first-month" aria-label="初回支払月（月）"></select>
+      </span>
+    </div>
+
+    <label class="field">
+      <span class="field-label">患者名（任意・保存されません）</span>
+      <span class="field-control"><input id="patient" type="text" autocomplete="off" placeholder="山田 太郎"><span class="unit">様</span></span>
+    </label>
+  </section>
+
+  <!-- 結果エリア（患者に見せる部分） -->
+  <section class="panel result-panel" aria-label="計算結果" aria-live="polite">
+    <div class="error" id="error" hidden></div>
+    <div class="placeholder" id="placeholder"></div>
+
+    <div id="result" hidden>
+      <div class="main-figure">
+        <div class="main-caption" id="main-caption"></div>
+        <div class="main-value" id="main-value"></div>
+      </div>
+
+      <dl class="summary" id="summary"></dl>
+
+      <div class="interest-row">
+        <span class="interest-label">利息総額</span>
+        <strong class="interest-value" id="interest-value"></strong>
+        <button type="button" id="btn-interest"></button>
+      </div>
+
+      <details class="schedule" open>
+        <summary>お支払いスケジュール</summary>
+        <div class="table-wrap">
+          <table id="schedule-table"></table>
+        </div>
+      </details>
+    </div>
+
+    <p class="note" id="note"></p>
+  </section>
+</main>
+
+<!-- 支払い表の出力 -->
+<dialog id="export-dialog" class="sheet" aria-labelledby="export-title">
+  <div class="sheet-header">
+    <h2 id="export-title">支払い表を出力</h2>
+    <button type="button" class="close" data-close>閉じる</button>
+  </div>
+  <div class="export-options">
+    <label>テンプレート <select id="export-template"></select></label>
+    <label class="switch"><input type="checkbox" id="export-interest"><span>利息を表示する</span></label>
+  </div>
+  <div class="export-actions">
+    <button type="button" class="primary" id="btn-print">印刷 / PDFで保存</button>
+    <button type="button" id="btn-open-tab">新しいタブで開く</button>
+  </div>
+  <p class="hint" id="print-hint"></p>
+  <iframe id="export-preview" title="支払い表のプレビュー" sandbox="allow-same-origin allow-modals"></iframe>
+</dialog>
+
+<!-- 設定 -->
+<dialog id="settings-dialog" class="sheet" aria-labelledby="settings-title">
+  <div class="sheet-header">
+    <h2 id="settings-title">設定</h2>
+    <button type="button" class="close" data-close>完了</button>
+  </div>
+  <div class="settings-body">
+    <fieldset>
+      <legend>院の情報</legend>
+      <label class="row">院名 <input type="text" data-setting="clinicName"></label>
+      <div class="row">
+        <span>ロゴ画像</span>
+        <img id="logo-preview" alt="" hidden>
+        <button type="button" class="small" id="btn-logo-remove" hidden>削除</button>
+        <label class="button small">画像を選ぶ…<input type="file" id="logo-file" accept="image/png,image/jpeg" hidden></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>見た目</legend>
+      <label class="row">テーマカラー <input type="color" data-setting="themeColor"></label>
+      <label class="row">強調色（既定と異なる年率の表示など） <input type="color" data-setting="accentColor"></label>
+      <label class="row">フォント名（空欄で標準） <input type="text" data-setting="fontName" placeholder="例: Hiragino Sans"></label>
+      <label class="row">文字サイズ <input type="range" min="12" max="28" step="1" data-setting="baseFontSize" data-type="number"><output data-output="baseFontSize"></output></label>
+      <label class="row">結果の文字サイズ <input type="range" min="32" max="120" step="2" data-setting="resultFontSize" data-type="number"><output data-output="resultFontSize"></output></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>文言</legend>
+      <label class="stack">注記文（画面下部と支払い表に表示） <textarea rows="2" data-setting="note"></textarea></label>
+      <label class="row">利息を伏せるときの表示 <input type="text" data-setting="interestMask"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>計算</legend>
+      <label class="row">端数処理 <select data-setting="rounding" id="setting-rounding"></select></label>
+      <label class="row">差額の調整（回数から求めるとき） <select data-setting="adjustment" id="setting-adjustment"></select></label>
+      <div class="row">
+        <label for="setting-default-rate">既定の年率</label>
+        <span class="field-control narrow"><input id="setting-default-rate" type="text" inputmode="decimal" autocomplete="off"><span class="unit">%</span></span>
+        <button type="button" class="small" id="btn-save-default-rate">保存</button>
+      </div>
+      <span class="field-label">ボーナス月の初期値</span>
+      <div class="months" id="default-bonus-months" role="group" aria-label="ボーナス月の初期値"></div>
+      <p class="hint">返済方式は元利均等。月利は年率 ÷ 12 で、日割りはしません。</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>支払い表テンプレート</legend>
+      <label class="row">使用するテンプレート <select id="setting-template"></select></label>
+      <div class="button-row">
+        <label class="button small">テンプレートを読み込む…<input type="file" id="template-file" accept=".html,.htm,text/html" hidden></label>
+        <button type="button" class="small" id="btn-template-delete">選択中のテンプレートを削除</button>
+        <button type="button" class="small" id="btn-template-download">既定のテンプレートをダウンロード</button>
+      </div>
+      <p class="hint">既定のテンプレートをダウンロードして編集し、「読み込む」で追加できます。読み込んだテンプレートは設定に含まれます。</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>設定の移行</legend>
+      <div class="button-row">
+        <button type="button" class="small" id="btn-settings-export">設定を書き出す</button>
+        <label class="button small">設定を読み込む…<input type="file" id="settings-file" accept=".json,application/json" hidden></label>
+        <button type="button" class="small danger" id="btn-settings-reset">初期状態に戻す</button>
+      </div>
+      <p class="hint">書き出したファイルを別のMacやiPadで読み込むと、同じ設定（ロゴ・既定の年率・テンプレートを含む）になります。設定はこのブラウザの中にだけ保存されます。</p>
+    </fieldset>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="js/core.js"></script>
+<script src="js/default-template.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

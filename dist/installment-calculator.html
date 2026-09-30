@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>分割払い計算</title>
+<meta name="description" content="分割払いの月額・回数を計算し、支払い表を印刷・PDF保存します。入力内容は保存・送信しません。">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="分割払い計算">
+<meta name="theme-color" content="#2F6F8F">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj4KICA8cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iIzJGNkY4RiIvPgogIDxyZWN0IHg9IjExNiIgeT0iOTYiIHdpZHRoPSIyODAiIGhlaWdodD0iMzIwIiByeD0iMjgiIGZpbGw9IiNmZmYiLz4KICA8cmVjdCB4PSIxNTAiIHk9IjEzNiIgd2lkdGg9IjIxMiIgaGVpZ2h0PSI2NCIgcng9IjEwIiBmaWxsPSIjZGZlYWYwIi8+CiAgPHRleHQgeD0iMzQ0IiB5PSIxODIiIGZvbnQtZmFtaWx5PSJIZWx2ZXRpY2EsIEFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjQ0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMkY2RjhGIiB0ZXh0LWFuY2hvcj0iZW5kIj7CpTwvdGV4dD4KICA8ZyBmaWxsPSIjMkY2RjhGIj4KICAgIDxyZWN0IHg9IjE1MCIgeT0iMjI2IiB3aWR0aD0iNTYiIGhlaWdodD0iNDQiIHJ4PSI4Ii8+PHJlY3QgeD0iMjI4IiB5PSIyMjYiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0NCIgcng9IjgiLz48cmVjdCB4PSIzMDYiIHk9IjIyNiIgd2lkdGg9IjU2IiBoZWlnaHQ9IjQ0IiByeD0iOCIgZmlsbD0iI0UwN0EyRSIvPgogICAgPHJlY3QgeD0iMTUwIiB5PSIyODgiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0NCIgcng9IjgiLz48cmVjdCB4PSIyMjgiIHk9IjI4OCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjQ0IiByeD0iOCIvPjxyZWN0IHg9IjMwNiIgeT0iMjg4IiB3aWR0aD0iNTYiIGhlaWdodD0iNDQiIHJ4PSI4Ii8+CiAgICA8cmVjdCB4PSIxNTAiIHk9IjM1MCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjQ0IiByeD0iOCIvPjxyZWN0IHg9IjIyOCIgeT0iMzUwIiB3aWR0aD0iNTYiIGhlaWdodD0iNDQiIHJ4PSI4Ii8+PHJlY3QgeD0iMzA2IiB5PSIzNTAiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0NCIgcng9IjgiLz4KICA8L2c+Cjwvc3ZnPgo=" type="image/svg+xml">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<style>
+/* 色・フォント・文字サイズは設定から app.js が :root の変数に入れる。ここには既定値だけを書く。 */
+:root {
+  --primary: #2F6F8F;
+  --accent: #E07A2E;
+  --font: system-ui, -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", sans-serif;
+  --base: 17px;
+  --result: 56px;
+
+  --bg: #f5f7f8;
+  --panel: #ffffff;
+  --text: #1f2a30;
+  --muted: #5f6b72;
+  --line: #d9dfe3;
+  --soft: color-mix(in srgb, var(--primary) 9%, white);
+  --danger: #c0392b;
+  --tap: 44px;
+  --radius: 10px;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--base);
+  line-height: 1.5;
+}
+[hidden] { display: none !important; }
+
+button, .button, input, select, textarea { font: inherit; color: inherit; }
+button, .button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: var(--tap); padding: 0 16px;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--panel); cursor: pointer; white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+button:hover:not(:disabled), .button:hover { border-color: var(--primary); }
+button:disabled { opacity: .45; cursor: default; }
+button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+button.small, .button.small { min-height: 36px; padding: 0 12px; font-size: .85em; }
+button.danger { color: var(--danger); }
+:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent); outline-offset: 2px; }
+
+input[type="text"], select, textarea {
+  min-height: var(--tap); width: 100%;
+  padding: 6px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff;
+}
+input[type="text"][inputmode] { text-align: right; font-variant-numeric: tabular-nums; }
+input[type="checkbox"], input[type="radio"] { width: 22px; height: 22px; accent-color: var(--primary); }
+
+/* ヘッダー */
+.appbar {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 10px max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left));
+  padding-top: max(10px, env(safe-area-inset-top));
+  background: var(--panel); border-bottom: 1px solid var(--line);
+}
+.appbar h1 { margin: 0; font-size: 1.1em; color: var(--primary); }
+.appbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* レイアウト: 広い画面は左右、狭い画面（iPad縦など）は上下 */
+.layout {
+  display: grid; gap: 16px; padding: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1400px; margin: 0 auto;
+}
+@media (min-width: 900px) {
+  .layout { grid-template-columns: minmax(320px, 400px) minmax(0, 1fr); align-items: start; }
+  .input-panel { position: sticky; top: 80px; }
+}
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
+
+/* 入力 */
+.input-panel { display: grid; gap: 18px; }
+.field { display: grid; gap: 6px; }
+.field-label { font-size: .85em; color: var(--muted); }
+.field-control { display: flex; align-items: center; gap: 8px; }
+.field-control.narrow { max-width: 160px; }
+.unit { color: var(--muted); min-width: 1.2em; }
+
+.segmented { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.segmented label { position: relative; }
+.segmented input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.segmented span { display: flex; align-items: center; justify-content: center; min-height: var(--tap); font-weight: 600; }
+.segmented input:checked + span { background: var(--primary); color: #fff; }
+.segmented input:focus-visible + span { outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent); outline-offset: -3px; }
+
+.rate-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .85em; color: var(--muted); }
+.rate-status .rate-message { flex: 1 1 auto; }
+.rate-buttons { display: flex; gap: 6px; }
+.rate-differs #rate { border: 2px solid var(--accent); }
+.rate-differs .rate-message { color: var(--accent); font-weight: 600; }
+
+.switch { display: inline-flex; align-items: center; gap: 10px; min-height: var(--tap); cursor: pointer; }
+#bonus-fields { display: grid; gap: 8px; margin-top: 6px; }
+.months { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.months button { min-height: 40px; padding: 0; background: #eef2f4; border-color: transparent; }
+.months button[aria-pressed="true"] { background: var(--primary); color: #fff; }
+#first-year, #first-month { width: auto; }
+
+/* 結果 */
+.result-panel { display: grid; gap: 24px; }
+.placeholder { color: var(--muted); font-size: 1.1em; padding: 60px 0; text-align: center; }
+.error { background: #fdecea; color: var(--danger); border-radius: 12px; padding: 14px 16px; font-weight: 600; }
+#result { display: grid; gap: 24px; }
+.main-figure { background: var(--soft); border-radius: 16px; padding: 20px 24px; color: var(--primary); }
+.main-caption { color: var(--muted); font-size: 1.1em; font-weight: 600; }
+.main-value { font-size: var(--result); font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.main-value .unit-l { font-size: .4em; font-weight: 600; margin-left: 4px; }
+.main-value .sub { font-size: .38em; font-weight: 600; color: var(--muted); margin-left: 10px; white-space: nowrap; }
+
+.summary { display: grid; grid-template-columns: auto 1fr; gap: 10px 24px; margin: 0; align-items: baseline; }
+.summary dt { color: var(--muted); }
+.summary dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.summary dd.big { font-size: calc(var(--result) * .45); }
+
+.interest-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.interest-label { color: var(--muted); }
+.interest-value { font-size: 1.1em; font-variant-numeric: tabular-nums; }
+#btn-interest { margin-left: auto; }
+
+.schedule summary { cursor: pointer; font-weight: 600; font-size: 1.1em; min-height: var(--tap); display: flex; align-items: center; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.schedule table { width: 100%; border-collapse: collapse; font-size: .85em; font-variant-numeric: tabular-nums; }
+.schedule th { color: var(--muted); font-weight: 600; text-align: right; padding: 6px 8px; border-bottom: 2px solid var(--line); white-space: nowrap; }
+.schedule td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.schedule td.masked { color: var(--muted); }
+.schedule tr.bonus-row td { background: color-mix(in srgb, var(--accent) 7%, white); }
+
+.note { color: var(--muted); font-size: .85em; margin: 0; white-space: pre-wrap; }
+
+/* ダイアログ */
+dialog.sheet {
+  width: min(960px, calc(100vw - 24px)); max-height: calc(100dvh - 24px);
+  border: none; border-radius: 16px; padding: 0; background: var(--panel); color: var(--text);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+}
+dialog.sheet::backdrop { background: rgba(20, 30, 36, .45); }
+dialog.sheet[open] { display: flex; flex-direction: column; }
+.sheet-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 12px 20px; border-bottom: 1px solid var(--line); }
+.sheet-header h2 { margin: 0; font-size: 1.1em; }
+
+#export-dialog { height: calc(100dvh - 24px); }
+.export-options, .export-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 12px 20px 0; }
+.export-options select { width: auto; min-width: 200px; margin-left: 6px; }
+#export-dialog .hint { padding: 8px 20px 0; }
+#export-preview { flex: 1; min-height: 300px; width: 100%; border: none; border-top: 1px solid var(--line); background: #e9edef; margin-top: 12px; }
+
+.settings-body { overflow-y: auto; padding: 8px 20px 24px; }
+fieldset { border: none; border-bottom: 1px solid var(--line); padding: 14px 0; margin: 0; display: grid; gap: 10px; }
+fieldset:last-child { border-bottom: none; }
+legend { font-weight: 700; color: var(--primary); padding: 0; margin-bottom: 6px; float: left; width: 100%; }
+fieldset .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+fieldset .row > input[type="text"], fieldset .row > select { width: auto; flex: 1 1 220px; max-width: 420px; }
+fieldset .row > input[type="range"] { flex: 1 1 160px; max-width: 320px; }
+fieldset .stack { display: grid; gap: 6px; }
+fieldset output { min-width: 3.5em; text-align: right; font-variant-numeric: tabular-nums; }
+input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); border-radius: 8px; padding: 2px; background: #fff; }
+#logo-preview { max-height: 40px; max-width: 160px; margin-left: auto; }
+.button-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.hint { color: var(--muted); font-size: .8em; margin: 0; }
+
+.toast {
+  position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-50%);
+  background: #263238; color: #fff; padding: 12px 18px; border-radius: 12px; z-index: 100;
+  max-width: calc(100vw - 32px); box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+}
+.toast.error { background: var(--danger); }
+</style>
+</head>
+<body>
+<header class="appbar">
+  <h1>分割払い計算</h1>
+  <div class="appbar-actions">
+    <button type="button" id="btn-clear" title="次の患者に備えて入力をすべて消します">入力をクリア</button>
+    <button type="button" id="btn-export" class="primary" disabled>支払い表を出力</button>
+    <button type="button" id="btn-settings">設定</button>
+  </div>
+</header>
+
+<main class="layout">
+  <!-- 入力エリア -->
+  <section class="panel input-panel" aria-label="入力">
+    <div class="segmented" role="radiogroup" aria-label="計算モード">
+      <label><input type="radio" name="mode" value="payment"><span>① 月額から</span></label>
+      <label><input type="radio" name="mode" value="installments" checked><span>② 回数から</span></label>
+    </div>
+
+    <label class="field">
+      <span class="field-label">支払総額（税込）</span>
+      <span class="field-control"><input id="principal" type="text" inputmode="numeric" autocomplete="off" placeholder="1,000,000"><span class="unit">円</span></span>
+    </label>
+
+    <div class="field">
+      <label class="field-label" for="rate">年率</label>
+      <span class="field-control"><input id="rate" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="unit">%</span></span>
+      <div class="rate-status" id="rate-status">
+        <span class="rate-message" id="rate-message"></span>
+        <span class="rate-buttons" id="rate-buttons">
+          <button type="button" class="small" id="btn-rate-reset">既定に戻す</button>
+          <button type="button" class="small" id="btn-rate-default">この値を既定にする</button>
+        </span>
+      </div>
+    </div>
+
+    <label class="field" data-mode="installments">
+      <span class="field-label">分割回数</span>
+      <span class="field-control"><input id="installments" type="text" inputmode="numeric" autocomplete="off" placeholder="36"><span class="unit">回</span></span>
+    </label>
+
+    <label class="field" data-mode="payment" hidden>
+      <span class="field-label" id="payment-label">月額</span>
+      <span class="field-control"><input id="payment" type="text" inputmode="numeric" autocomplete="off" placeholder="30,000"><span class="unit">円</span></span>
+    </label>
+
+    <div class="field">
+      <label class="switch"><input type="checkbox" id="bonus-enabled"><span>ボーナス払い</span></label>
+      <div id="bonus-fields" hidden>
+        <label class="field">
+          <span class="field-label">ボーナス月の加算額</span>
+          <span class="field-control"><input id="bonus-amount" type="text" inputmode="numeric" autocomplete="off" placeholder="50,000"><span class="unit">円</span></span>
+        </label>
+        <span class="field-label">ボーナス月</span>
+        <div class="months" id="bonus-months" role="group" aria-label="ボーナス月"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">初回支払月</span>
+      <span class="field-control">
+        <select id="first-year" aria-label="初回支払月（年）"></select>
+        <select id="first-month" aria-label="初回支払月（月）"></select>
+      </span>
+    </div>
+
+    <label class="field">
+      <span class="field-label">患者名（任意・保存されません）</span>
+      <span class="field-control"><input id="patient" type="text" autocomplete="off" placeholder="山田 太郎"><span class="unit">様</span></span>
+    </label>
+  </section>
+
+  <!-- 結果エリア（患者に見せる部分） -->
+  <section class="panel result-panel" aria-label="計算結果" aria-live="polite">
+    <div class="error" id="error" hidden></div>
+    <div class="placeholder" id="placeholder"></div>
+
+    <div id="result" hidden>
+      <div class="main-figure">
+        <div class="main-caption" id="main-caption"></div>
+        <div class="main-value" id="main-value"></div>
+      </div>
+
+      <dl class="summary" id="summary"></dl>
+
+      <div class="interest-row">
+        <span class="interest-label">利息総額</span>
+        <strong class="interest-value" id="interest-value"></strong>
+        <button type="button" id="btn-interest"></button>
+      </div>
+
+      <details class="schedule" open>
+        <summary>お支払いスケジュール</summary>
+        <div class="table-wrap">
+          <table id="schedule-table"></table>
+        </div>
+      </details>
+    </div>
+
+    <p class="note" id="note"></p>
+  </section>
+</main>
+
+<!-- 支払い表の出力 -->
+<dialog id="export-dialog" class="sheet" aria-labelledby="export-title">
+  <div class="sheet-header">
+    <h2 id="export-title">支払い表を出力</h2>
+    <button type="button" class="close" data-close>閉じる</button>
+  </div>
+  <div class="export-options">
+    <label>テンプレート <select id="export-template"></select></label>
+    <label class="switch"><input type="checkbox" id="export-interest"><span>利息を表示する</span></label>
+  </div>
+  <div class="export-actions">
+    <button type="button" class="primary" id="btn-print">印刷 / PDFで保存</button>
+    <button type="button" id="btn-open-tab">新しいタブで開く</button>
+  </div>
+  <p class="hint" id="print-hint"></p>
+  <iframe id="export-preview" title="支払い表のプレビュー" sandbox="allow-same-origin allow-modals"></iframe>
+</dialog>
+
+<!-- 設定 -->
+<dialog id="settings-dialog" class="sheet" aria-labelledby="settings-title">
+  <div class="sheet-header">
+    <h2 id="settings-title">設定</h2>
+    <button type="button" class="close" data-close>完了</button>
+  </div>
+  <div class="settings-body">
+    <fieldset>
+      <legend>院の情報</legend>
+      <label class="row">院名 <input type="text" data-setting="clinicName"></label>
+      <div class="row">
+        <span>ロゴ画像</span>
+        <img id="logo-preview" alt="" hidden>
+        <button type="button" class="small" id="btn-logo-remove" hidden>削除</button>
+        <label class="button small">画像を選ぶ…<input type="file" id="logo-file" accept="image/png,image/jpeg" hidden></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>見た目</legend>
+      <label class="row">テーマカラー <input type="color" data-setting="themeColor"></label>
+      <label class="row">強調色（既定と異なる年率の表示など） <input type="color" data-setting="accentColor"></label>
+      <label class="row">フォント名（空欄で標準） <input type="text" data-setting="fontName" placeholder="例: Hiragino Sans"></label>
+      <label class="row">文字サイズ <input type="range" min="12" max="28" step="1" data-setting="baseFontSize" data-type="number"><output data-output="baseFontSize"></output></label>
+      <label class="row">結果の文字サイズ <input type="range" min="32" max="120" step="2" data-setting="resultFontSize" data-type="number"><output data-output="resultFontSize"></output></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>文言</legend>
+      <label class="stack">注記文（画面下部と支払い表に表示） <textarea rows="2" data-setting="note"></textarea></label>
+      <label class="row">利息を伏せるときの表示 <input type="text" data-setting="interestMask"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>計算</legend>
+      <label class="row">端数処理 <select data-setting="rounding" id="setting-rounding"></select></label>
+      <label class="row">差額の調整（回数から求めるとき） <select data-setting="adjustment" id="setting-adjustment"></select></label>
+      <div class="row">
+        <label for="setting-default-rate">既定の年率</label>
+        <span class="field-control narrow"><input id="setting-default-rate" type="text" inputmode="decimal" autocomplete="off"><span class="unit">%</span></span>
+        <button type="button" class="small" id="btn-save-default-rate">保存</button>
+      </div>
+      <span class="field-label">ボーナス月の初期値</span>
+      <div class="months" id="default-bonus-months" role="group" aria-label="ボーナス月の初期値"></div>
+      <p class="hint">返済方式は元利均等。月利は年率 ÷ 12 で、日割りはしません。</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>支払い表テンプレート</legend>
+      <label class="row">使用するテンプレート <select id="setting-template"></select></label>
+      <div class="button-row">
+        <label class="button small">テンプレートを読み込む…<input type="file" id="template-file" accept=".html,.htm,text/html" hidden></label>
+        <button type="button" class="small" id="btn-template-delete">選択中のテンプレートを削除</button>
+        <button type="button" class="small" id="btn-template-download">既定のテンプレートをダウンロード</button>
+      </div>
+      <p class="hint">既定のテンプレートをダウンロードして編集し、「読み込む」で追加できます。読み込んだテンプレートは設定に含まれます。</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>設定の移行</legend>
+      <div class="button-row">
+        <button type="button" class="small" id="btn-settings-export">設定を書き出す</button>
+        <label class="button small">設定を読み込む…<input type="file" id="settings-file" accept=".json,application/json" hidden></label>
+        <button type="button" class="small danger" id="btn-settings-reset">初期状態に戻す</button>
+      </div>
+      <p class="hint">書き出したファイルを別のMacやiPadで読み込むと、同じ設定（ロゴ・既定の年率・テンプレートを含む）になります。設定はこのブラウザの中にだけ保存されます。</p>
+    </fieldset>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/*
+ * 分割払い計算のコア（計算・入力の解釈・表示の書式・テンプレート差し込み・設定）。
+ * 画面（DOM）には依存しない。ブラウザでは window.InstallmentCore、Node.js では require() で使う。
+ */
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.InstallmentCore = api;
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  /** これを超える年率は入力ミスとみなす（%） */
+  const MAX_RATE_PERCENT = 30;
+  /** 分割回数の上限（50年） */
+  const MAX_INSTALLMENTS = 600;
+  /** 年率は 1/10000 % 単位の整数（BigInt）で持ち、利息計算を誤差なく行う */
+  const RATE_SCALE = 10000n;
+  const RATE_DECIMALS = 4;
+
+  // ---------------------------------------------------------------------------
+  // エラー
+
+  const MESSAGES = {
+    invalidPrincipal: '支払総額は1円以上の整数で入力してください。',
+    invalidRate: `年率は0〜${MAX_RATE_PERCENT}%の範囲で入力してください（小数は${RATE_DECIMALS}桁まで）。`,
+    invalidInstallments: '分割回数は1以上の整数で入力してください。',
+    invalidMonthlyPayment: '月額は1円以上の整数で入力してください。',
+    invalidBonusAmount: 'ボーナス加算額は0円以上の整数で入力してください。',
+    invalidBonusMonth: 'ボーナス月は1〜12月から選んでください。',
+    cannotRepay: '月額（およびボーナス）が毎月の利息以下のため、完済できません。',
+    tooManyInstallments: `分割回数が上限（${MAX_INSTALLMENTS}回）を超えます。月額を増やしてください。`,
+    bonusTooLarge: 'ボーナス加算額が大きすぎるため、月額を求められません。',
+  };
+
+  class CalcError extends Error {
+    constructor(code) {
+      super(MESSAGES[code] || code);
+      this.name = 'CalcError';
+      this.code = code;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 端数処理
+
+  const ROUNDING_RULES = { down: '切り捨て', up: '切り上げ', nearest: '四捨五入' };
+  const ADJUSTMENTS = { last: '最終回で調整', first: '初回で調整' };
+
+  /** 0以上の num / den を円に丸める（BigInt） */
+  function roundRatio(num, den, rule) {
+    let q;
+    switch (rule) {
+      case 'up': q = (num + den - 1n) / den; break;
+      case 'nearest': q = (2n * num + den) / (2n * den); break;
+      default: q = num / den;
+    }
+    return Number(q);
+  }
+
+  function roundNumber(value, rule) {
+    switch (rule) {
+      case 'up': return Math.ceil(value - 1e-9);
+      case 'nearest': return Math.round(value);
+      default: return Math.floor(value + 1e-9);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 入力の解釈（全角数字・カンマ・「円」「%」・空白を許す）
+
+  function normalizeNumberText(text) {
+    let out = '';
+    for (const ch of String(text ?? '')) {
+      const code = ch.codePointAt(0);
+      if (code >= 0xff10 && code <= 0xff19) out += String.fromCharCode(code - 0xff10 + 0x30);
+      else if (ch === '．') out += '.';
+      else if (ch === '－' || ch === '−') out += '-';
+      else if (',，、 　円%％'.includes(ch)) continue;
+      else out += ch;
+    }
+    return out;
+  }
+
+  /** 整数。小数や文字を含むものは null */
+  function parseInteger(text) {
+    const s = normalizeNumberText(text);
+    if (!/^-?\d+$/.test(s)) return null;
+    const n = Number(s);
+    return Number.isSafeInteger(n) ? n : null;
+  }
+
+  /** 年率の文字列 → 1/10000 % 単位の BigInt。解釈できなければ null */
+  function parseRate(text) {
+    const s = normalizeNumberText(text);
+    const m = /^(-?)(\d*)(?:\.(\d*))?$/.exec(s);
+    if (!m || (m[2] === '' && (m[3] ?? '') === '')) return null;
+    const frac = m[3] ?? '';
+    if (frac.length > RATE_DECIMALS) return null;
+    const scaled = BigInt(m[2] || '0') * RATE_SCALE + BigInt((frac + '0000').slice(0, RATE_DECIMALS));
+    return m[1] === '-' ? -scaled : scaled;
+  }
+
+  /** 1/10000 % 単位 → "3", "2.5" */
+  function formatRate(scaled) {
+    const neg = scaled < 0n;
+    const abs = neg ? -scaled : scaled;
+    const whole = abs / RATE_SCALE;
+    let frac = String(abs % RATE_SCALE).padStart(RATE_DECIMALS, '0').replace(/0+$/, '');
+    return (neg ? '-' : '') + whole + (frac ? '.' + frac : '');
+  }
+
+  // ---------------------------------------------------------------------------
+  // 年月
+
+  function addMonths(ym, months) {
+    const index = ym.year * 12 + (ym.month - 1) + months;
+    return { year: Math.floor(index / 12), month: (index % 12) + 1 };
+  }
+
+  function nextMonth(date = new Date()) {
+    return addMonths({ year: date.getFullYear(), month: date.getMonth() + 1 }, 1);
+  }
+
+  // ---------------------------------------------------------------------------
+  // 計算
+
+  function bonusAddition(bonus, ym) {
+    return bonus && bonus.amount > 0 && bonus.months.includes(ym.month) ? bonus.amount : 0;
+  }
+
+  function isBonusActive(bonus) {
+    return !!bonus && bonus.amount > 0 && bonus.months.length > 0;
+  }
+
+  function validate(input) {
+    if (!Number.isSafeInteger(input.principal) || input.principal <= 0) throw new CalcError('invalidPrincipal');
+    if (typeof input.rate !== 'bigint' || input.rate < 0n || input.rate > BigInt(MAX_RATE_PERCENT) * RATE_SCALE) {
+      throw new CalcError('invalidRate');
+    }
+    if (input.mode === 'installments') {
+      if (!Number.isSafeInteger(input.value) || input.value < 1) throw new CalcError('invalidInstallments');
+      if (input.value > MAX_INSTALLMENTS) throw new CalcError('tooManyInstallments');
+    } else {
+      if (!Number.isSafeInteger(input.value) || input.value < 1) throw new CalcError('invalidMonthlyPayment');
+    }
+    if (input.bonus) {
+      if (!Number.isSafeInteger(input.bonus.amount) || input.bonus.amount < 0) throw new CalcError('invalidBonusAmount');
+      if (!input.bonus.months.every((m) => Number.isInteger(m) && m >= 1 && m <= 12)) throw new CalcError('invalidBonusMonth');
+    }
+  }
+
+  /** 月ごとの残高シミュレーション */
+  function makeSimulator(input, rule) {
+    const bonus = input.bonus || { amount: 0, months: [] };
+    const den = 1200n * RATE_SCALE;
+    const interestOn = (balance) => (balance <= 0 ? 0 : roundRatio(BigInt(balance) * input.rate, den, rule));
+    const monthAt = (k) => addMonths(input.firstMonth, k - 1);
+
+    function finalRow(k, month, due, interest, bonusAdd) {
+      return { no: k, month, payment: due, bonus: Math.min(bonusAdd, due), principal: due - interest, interest, balance: 0 };
+    }
+
+    /** 回数を決めて支払う（モード②）。最終回は残高に合わせて調整。途中で完済できたらそこで終わる */
+    function run(regular, n, firstPayment) {
+      const rows = [];
+      let balance = input.principal;
+      for (let k = 1; k <= n; k++) {
+        const month = monthAt(k);
+        const interest = interestOn(balance);
+        const bonusAdd = bonusAddition(bonus, month);
+        const base = k === 1 && firstPayment != null ? firstPayment : regular;
+        const due = balance + interest;
+        if (k === n || base + bonusAdd >= due) {
+          rows.push(finalRow(k, month, due, interest, bonusAdd));
+          break;
+        }
+        const payment = base + bonusAdd;
+        balance -= payment - interest;
+        rows.push({ no: k, month, payment, bonus: bonusAdd, principal: payment - interest, interest, balance });
+      }
+      return rows;
+    }
+
+    /**
+     * 月額を決めて完済まで支払う（モード①）。
+     * 月額を円に丸めたことによる残り（1回あたり1円未満の積み重ね）しか残らない場合は、
+     * 新しい回を作らずその回に合算する。これで②の月額を①に入れると同じ回数に戻る。
+     */
+    function runUntilRepaid(regular) {
+      const rows = [];
+      let balance = input.principal;
+      let checkpoint = balance;
+      const growth = 1 + Number(input.rate) / Number(den);
+      let slack = 0;
+
+      if (!isBonusActive(bonus) && regular <= interestOn(balance)) throw new CalcError('cannotRepay');
+
+      for (let k = 1; ; k++) {
+        if (k > MAX_INSTALLMENTS) throw new CalcError('tooManyInstallments');
+        const month = monthAt(k);
+        const interest = interestOn(balance);
+        const bonusAdd = bonusAddition(bonus, month);
+        const due = balance + interest;
+        let payment = regular + bonusAdd;
+        if (payment >= due) {
+          rows.push(finalRow(k, month, due, interest, bonusAdd));
+          return rows;
+        }
+        balance -= payment - interest;
+        slack = slack * growth + 1;
+        const tolerance = Math.min(Math.floor(slack), Math.floor(regular / 2));
+        if (balance <= tolerance) {
+          payment += balance;
+          balance = 0;
+        }
+        rows.push({ no: k, month, payment, bonus: bonusAdd, principal: payment - interest, interest, balance });
+        if (balance === 0) return rows;
+        // 1年ごとに残高が減っているか確認（ボーナス月の支払いも含めて判定）
+        if (k % 12 === 0) {
+          if (balance >= checkpoint) throw new CalcError('cannotRepay');
+          checkpoint = balance;
+        }
+      }
+    }
+
+    return { run, runUntilRepaid };
+  }
+
+  /**
+   * n回ちょうどで残高が0になる月額（ボーナスを除く）。
+   * A = Σ (P + B_k) / (1 + r)^k は P の1次式なので直接解ける（ボーナスなしなら公式と一致）。
+   */
+  function solveMonthlyPayment(input, n, rule) {
+    const r = Number(input.rate) / Number(1200n * RATE_SCALE);
+    let annuity = 0;
+    let bonusValue = 0;
+    let discount = 1;
+    for (let k = 1; k <= n; k++) {
+      discount /= 1 + r;
+      annuity += discount;
+      bonusValue += bonusAddition(input.bonus, addMonths(input.firstMonth, k - 1)) * discount;
+    }
+    const payment = roundNumber((input.principal - bonusValue) / annuity, rule);
+    if (payment < 1) throw new CalcError(isBonusActive(input.bonus) ? 'bonusTooLarge' : 'invalidPrincipal');
+    return payment;
+  }
+
+  /** 差額を初回で調整：最終回がなるべく通常額と同じになるよう初回の額を決める */
+  function adjustFirstPayment(sim, input, regular, n, fallback) {
+    const last = fallback[fallback.length - 1];
+    if (!last || fallback.length !== n) return fallback;
+    const expectedLast = regular + last.bonus;
+    const growth = Math.pow(1 + Number(input.rate) / Number(1200n * RATE_SCALE), n - 1);
+    const estimate = regular + Math.round((last.payment - expectedLast) / growth);
+    let best = fallback;
+    let bestGap = Math.abs(last.payment - expectedLast);
+    for (let first = estimate - 3; first <= estimate + 3; first++) {
+      if (first < 1) continue;
+      const candidate = sim.run(regular, n, first);
+      const cl = candidate[candidate.length - 1];
+      if (candidate.length !== n) continue;
+      const gap = Math.abs(cl.payment - expectedLast);
+      const bestLast = best[best.length - 1].payment;
+      if (gap < bestGap || (gap === bestGap && cl.payment <= expectedLast && bestLast > expectedLast)) {
+        best = candidate;
+        bestGap = gap;
+      }
+    }
+    return best;
+  }
+
+  /**
+   * 計算する。
+   * @param input { principal, rate(BigInt, 1/10000%), mode: 'installments'|'payment', value, bonus: {amount, months}|null, firstMonth: {year, month} }
+   * @param options { rounding: 'down'|'up'|'nearest', adjustment: 'last'|'first' }
+   */
+  function calculate(input, options = {}) {
+    const rule = options.rounding || 'down';
+    validate(input);
+    const sim = makeSimulator(input, rule);
+    let monthlyPayment;
+    let schedule;
+    if (input.mode === 'installments') {
+      monthlyPayment = solveMonthlyPayment(input, input.value, rule);
+      schedule = sim.run(monthlyPayment, input.value);
+      if (options.adjustment === 'first' && input.value > 1) {
+        schedule = adjustFirstPayment(sim, input, monthlyPayment, input.value, schedule);
+      }
+    } else {
+      monthlyPayment = input.value;
+      schedule = sim.runUntilRepaid(monthlyPayment);
+    }
+    return makeResult(input, monthlyPayment, schedule);
+  }
+
+  function makeResult(input, monthlyPayment, schedule) {
+    const sum = (key) => schedule.reduce((a, row) => a + row[key], 0);
+    const totalPayment = sum('payment');
+    return {
+      input,
+      monthlyPayment,
+      schedule,
+      installments: schedule.length,
+      totalPayment,
+      totalInterest: totalPayment - input.principal,
+      totalBonus: sum('bonus'),
+      firstPayment: schedule[0].payment,
+      lastPayment: schedule[schedule.length - 1].payment,
+    };
+  }
+
+  /** 参考: ボーナスなしの月額の公式（丸める前） */
+  function monthlyPaymentFormula(principal, monthlyRate, n) {
+    if (monthlyRate === 0) return principal / n;
+    return (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -n));
+  }
+
+  /** 参考: ボーナスなしの回数の公式（切り上げ前）。完済不能なら null */
+  function installmentsFormula(principal, monthlyRate, payment) {
+    if (monthlyRate === 0) return principal / payment;
+    const x = 1 - (principal * monthlyRate) / payment;
+    return x > 0 ? -Math.log(x) / Math.log(1 + monthlyRate) : null;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 入力フォーム → 計算の入力
+
+  function emptyForm(defaultBonusMonths = [6, 12], date = new Date()) {
+    return {
+      mode: 'installments', // 'installments'（② 回数から）| 'payment'（① 月額から）
+      principalText: '',
+      rateText: '',
+      installmentsText: '',
+      paymentText: '',
+      bonusEnabled: false,
+      bonusAmountText: '',
+      bonusMonths: [...defaultBonusMonths],
+      firstMonth: nextMonth(date),
+      patientName: '',
+    };
+  }
+
+  function isFormReady(form) {
+    const main = form.mode === 'installments' ? form.installmentsText : form.paymentText;
+    return [form.principalText, form.rateText, main].every((t) => String(t ?? '').trim() !== '');
+  }
+
+  function formToInput(form) {
+    const principal = parseInteger(form.principalText);
+    if (principal == null || principal <= 0) throw new CalcError('invalidPrincipal');
+    const rate = parseRate(form.rateText);
+    if (rate == null) throw new CalcError('invalidRate');
+    let value;
+    if (form.mode === 'installments') {
+      value = parseInteger(form.installmentsText);
+      if (value == null || value < 1) throw new CalcError('invalidInstallments');
+    } else {
+      value = parseInteger(form.paymentText);
+      if (value == null || value < 1) throw new CalcError('invalidMonthlyPayment');
+    }
+    let bonus = null;
+    if (form.bonusEnabled) {
+      const text = String(form.bonusAmountText ?? '').trim();
+      const amount = text === '' ? 0 : parseInteger(text);
+      if (amount == null || amount < 0) throw new CalcError('invalidBonusAmount');
+      bonus = { amount, months: [...form.bonusMonths].sort((a, b) => a - b) };
+    }
+    const input = { principal, rate, mode: form.mode, value, bonus, firstMonth: { ...form.firstMonth } };
+    validate(input);
+    return input;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 表示の書式
+
+  function formatYen(value) {
+    const s = String(Math.abs(value)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return value < 0 ? '-' + s : s;
+  }
+  const formatMonth = (ym) => `${ym.year}年${ym.month}月`;
+  const formatMonths = (months) => [...months].sort((a, b) => a - b).map((m) => `${m}月`).join('・');
+  const formatDate = (d) => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+
+  // ---------------------------------------------------------------------------
+  // HTMLテンプレート
+  //  - {{key}} を値に置換（HTMLエスケープ）。未知のキーはそのまま残す
+  //  - <!-- ROW_START --> 〜 <!-- ROW_END --> を1行分のひな形として回数分複製
+  //  - data-show="<section>" の要素は、そのセクションが非表示なら要素ごと除去
+
+  const ROW_START = '<!-- ROW_START -->';
+  const ROW_END = '<!-- ROW_END -->';
+  const VOID_ELEMENTS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
+
+  function escapeHTML(text) {
+    return String(text).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  }
+
+  function replacePlaceholders(html, values) {
+    return html.replace(/\{\{([^{}]*)\}\}/g, (whole, key) => {
+      const k = key.trim();
+      return Object.prototype.hasOwnProperty.call(values, k) ? escapeHTML(values[k]) : whole;
+    });
+  }
+
+  function expandRows(html, rows) {
+    let out = '';
+    let rest = html;
+    for (;;) {
+      const start = rest.indexOf(ROW_START);
+      if (start < 0) break;
+      const end = rest.indexOf(ROW_END, start + ROW_START.length);
+      if (end < 0) break;
+      out += rest.slice(0, start);
+      const tpl = rest.slice(start + ROW_START.length, end);
+      for (const row of rows) out += replacePlaceholders(tpl, row);
+      rest = rest.slice(end + ROW_END.length);
+    }
+    return out + rest;
+  }
+
+  function escapeRegExp(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function removeElements(html, section) {
+    const open = new RegExp(`<([A-Za-z][A-Za-z0-9-]*)\\b[^>]*\\bdata-show\\s*=\\s*["']${escapeRegExp(section)}["'][^>]*>`);
+    let result = html;
+    let from = 0;
+    for (;;) {
+      const m = open.exec(result.slice(from));
+      if (!m) break;
+      const startIdx = from + m.index;
+      const tag = m[1].toLowerCase();
+      let endIdx = startIdx + m[0].length;
+      if (!m[0].endsWith('/>') && !VOID_ELEMENTS.has(tag)) {
+        const re = new RegExp(`<(/?)${escapeRegExp(tag)}\\b[^>]*?(/?)>`, 'gi');
+        re.lastIndex = endIdx;
+        let depth = 1;
+        let t;
+        while ((t = re.exec(result))) {
+          if (t[1]) {
+            if (--depth === 0) { endIdx = t.index + t[0].length; break; }
+          } else if (!t[2]) depth++;
+        }
+      }
+      result = result.slice(0, startIdx) + result.slice(endIdx);
+      from = startIdx;
+    }
+    return result;
+  }
+
+  function renderTemplate(template, context) {
+    let html = template;
+    for (const section of [...context.hidden].sort()) html = removeElements(html, section);
+    html = expandRows(html, context.rows);
+    return replacePlaceholders(html, context.values);
+  }
+
+  /** 計算結果・設定から差し込む値を作る。金額はカンマ区切りの数字のみ（「円」はテンプレート側） */
+  function buildTemplateContext(result, settings, patientName, showInterest, issueDate = new Date()) {
+    const input = result.input;
+    const bonus = isBonusActive(input.bonus) && result.totalBonus > 0 ? input.bonus : null;
+    const first = result.schedule[0];
+    const last = result.schedule[result.schedule.length - 1];
+    const values = {
+      clinic_name: settings.clinicName,
+      patient_name: patientName,
+      issue_date: formatDate(issueDate),
+      principal: formatYen(input.principal),
+      annual_rate: formatRate(input.rate),
+      installments: String(result.installments),
+      monthly_payment: formatYen(result.monthlyPayment),
+      first_payment: formatYen(result.firstPayment),
+      last_payment: formatYen(result.lastPayment),
+      bonus_amount: bonus ? formatYen(bonus.amount) : '',
+      bonus_months: bonus ? formatMonths(bonus.months) : '',
+      total_bonus: formatYen(result.totalBonus),
+      total_payment: formatYen(result.totalPayment),
+      total_interest: showInterest ? formatYen(result.totalInterest) : '',
+      first_month: formatMonth(first.month),
+      last_month: formatMonth(last.month),
+      note: settings.note,
+      theme_color: settings.themeColor,
+      accent_color: settings.accentColor,
+      font_family: settings.fontName,
+      logo: settings.logo || '',
+    };
+    const rows = result.schedule.map((row) => ({
+      'row.no': String(row.no),
+      'row.month': formatMonth(row.month),
+      'row.payment': formatYen(row.payment),
+      'row.bonus': row.bonus > 0 ? formatYen(row.bonus) : '',
+      'row.principal': formatYen(row.principal),
+      'row.interest': showInterest ? formatYen(row.interest) : '',
+      'row.balance': formatYen(row.balance),
+    }));
+    const hidden = new Set();
+    if (!showInterest) hidden.add('interest');
+    if (!bonus) hidden.add('bonus');
+    if (!settings.logo) hidden.add('logo');
+    if (!String(patientName ?? '').trim()) hidden.add('patient');
+    return { values, rows, hidden };
+  }
+
+  // ---------------------------------------------------------------------------
+  // 設定（患者に関する項目は入れないこと）
+
+  const SETTINGS_VERSION = 1;
+  const DEFAULT_TEMPLATE_ID = 'default';
+
+  function defaultSettings() {
+    return {
+      version: SETTINGS_VERSION,
+      clinicName: '〇〇歯科クリニック',
+      logo: '', // data URL
+      themeColor: '#2F6F8F',
+      accentColor: '#E07A2E',
+      fontName: '',
+      baseFontSize: 17,
+      resultFontSize: 56,
+      note: '概算です。実際の条件は契約内容によります。',
+      interestMask: '●●●',
+      rounding: 'down',
+      adjustment: 'last',
+      defaultRate: '0', // 既定の年率（%、文字列で正確に保持）
+      defaultBonusMonths: [6, 12],
+      templateId: DEFAULT_TEMPLATE_ID,
+      templates: [], // 自作テンプレート [{ id, name, html }]
+    };
+  }
+
+  /** 読み込んだ設定を検証し、欠けた項目・不正な値は既定値で補う */
+  function normalizeSettings(raw) {
+    const d = defaultSettings();
+    if (!raw || typeof raw !== 'object') return d;
+    const s = { ...d };
+    const str = (k) => { if (typeof raw[k] === 'string') s[k] = raw[k]; };
+    const num = (k, min, max) => { if (typeof raw[k] === 'number' && raw[k] >= min && raw[k] <= max) s[k] = raw[k]; };
+    const color = (k) => { if (typeof raw[k] === 'string' && /^#[0-9a-fA-F]{6}$/.test(raw[k])) s[k] = raw[k]; };
+    ['clinicName', 'fontName', 'note', 'interestMask'].forEach(str);
+    if (typeof raw.logo === 'string' && (raw.logo === '' || raw.logo.startsWith('data:image/'))) s.logo = raw.logo;
+    color('themeColor');
+    color('accentColor');
+    num('baseFontSize', 10, 40);
+    num('resultFontSize', 20, 160);
+    if (raw.rounding in ROUNDING_RULES) s.rounding = raw.rounding;
+    if (raw.adjustment in ADJUSTMENTS) s.adjustment = raw.adjustment;
+    const rate = parseRate(raw.defaultRate);
+    if (rate != null && rate >= 0n && rate <= BigInt(MAX_RATE_PERCENT) * RATE_SCALE) s.defaultRate = formatRate(rate);
+    if (Array.isArray(raw.defaultBonusMonths)) {
+      s.defaultBonusMonths = [...new Set(raw.defaultBonusMonths.filter((m) => Number.isInteger(m) && m >= 1 && m <= 12))].sort((a, b) => a - b);
+    }
+    if (Array.isArray(raw.templates)) {
+      s.templates = raw.templates
+        .filter((t) => t && typeof t.id === 'string' && typeof t.name === 'string' && typeof t.html === 'string')
+        .map((t) => ({ id: t.id, name: t.name, html: t.html }));
+    }
+    if (typeof raw.templateId === 'string' && (raw.templateId === DEFAULT_TEMPLATE_ID || s.templates.some((t) => t.id === raw.templateId))) {
+      s.templateId = raw.templateId;
+    }
+    return s;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 年率の既定値（入力欄が既定値と違うか）
+
+  function rateDiffersFromDefault(rateText, defaultRate) {
+    const value = parseRate(rateText);
+    return value == null || value !== parseRate(defaultRate);
+  }
+
+  /** 「この値を既定にする」で保存できる値（正規化した文字列）。不正なら null */
+  function rateForDefault(rateText) {
+    const value = parseRate(rateText);
+    if (value == null || value < 0n || value > BigInt(MAX_RATE_PERCENT) * RATE_SCALE) return null;
+    return formatRate(value);
+  }
+
+  return {
+    MAX_RATE_PERCENT, MAX_INSTALLMENTS, RATE_SCALE, ROUNDING_RULES, ADJUSTMENTS, DEFAULT_TEMPLATE_ID, ROW_START, ROW_END,
+    CalcError, calculate, validate, monthlyPaymentFormula, installmentsFormula,
+    parseInteger, parseRate, formatRate, normalizeNumberText,
+    addMonths, nextMonth, emptyForm, isFormReady, formToInput,
+    formatYen, formatMonth, formatMonths, formatDate,
+    escapeHTML, renderTemplate, removeElements, buildTemplateContext,
+    defaultSettings, normalizeSettings, rateDiffersFromDefault, rateForDefault,
+  };
+});
+</script>
+<script>
+/* 同梱の既定テンプレート（支払い表）。ローカルファイルで開いても読めるよう JS の文字列で持つ。 */
+(function (root) {
+  const DEFAULT_TEMPLATE = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>お支払い予定表</title>
+<!--
+  既定のテンプレート。templates フォルダにコピーされるので、自由に編集できます。
+  使えるプレースホルダーや書き方は README の「支払い表テンプレート」を参照してください。
+-->
+<style>
+  @page { size: A4; margin: 14mm 12mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "{{font_family}}", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    color: #222; font-size: 10.5pt; margin: 0;
+  }
+  header { display: flex; align-items: center; justify-content: space-between;
+           border-bottom: 3px solid {{theme_color}}; padding-bottom: 6px; margin-bottom: 14px; }
+  header h1 { font-size: 18pt; margin: 0; color: {{theme_color}}; }
+  header .clinic { text-align: right; font-size: 11pt; }
+  header .clinic img { max-height: 40px; display: block; margin-left: auto; margin-bottom: 4px; }
+  .meta { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
+  .meta p { margin: 0; }
+  .patient { font-size: 14pt; border-bottom: 1px solid #999; padding: 0 24px 2px 0; margin: 0; }
+  .summary { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  .summary th, .summary td { border: 1px solid #bbb; padding: 6px 10px; }
+  .summary th { background: #f1f4f6; text-align: left; width: 30%; font-weight: normal; }
+  .summary td { text-align: right; font-size: 12pt; }
+  .summary .strong td { font-size: 15pt; font-weight: bold; color: {{theme_color}}; }
+  table.schedule { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  table.schedule th { background: {{theme_color}}; color: #fff; padding: 4px 6px; font-weight: normal; }
+  table.schedule td { border-bottom: 1px solid #ddd; padding: 3px 6px; text-align: right; }
+  table.schedule td.c { text-align: center; }
+  table.schedule tr { page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  /* 画面で見るとき（プレビュー）は用紙のように表示する。印刷には影響しない */
+  @media screen {
+    html { background: #e9edef; }
+    body { max-width: 210mm; margin: 16px auto; padding: 14mm 12mm; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+  }
+  .note { margin-top: 14px; font-size: 9pt; color: #555; border-left: 3px solid {{accent_color}}; padding-left: 8px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>お支払い予定表</h1>
+    <div class="clinic">
+      <img data-show="logo" src="{{logo}}" alt="">
+      {{clinic_name}}
+    </div>
+  </header>
+
+  <div class="meta">
+    <p class="patient" data-show="patient">{{patient_name}} 様</p>
+    <p>作成日: {{issue_date}}</p>
+  </div>
+
+  <table class="summary">
+    <tr><th>お支払総額（元本）</th><td>{{principal}} 円</td></tr>
+    <tr><th>年率</th><td>{{annual_rate}} %</td></tr>
+    <tr class="strong"><th>分割回数</th><td>{{installments}} 回</td></tr>
+    <tr class="strong"><th>月々のお支払い</th><td>{{monthly_payment}} 円</td></tr>
+    <tr data-show="bonus"><th>ボーナス月加算（{{bonus_months}}）</th><td>{{bonus_amount}} 円</td></tr>
+    <tr><th>お支払い期間</th><td>{{first_month}} 〜 {{last_month}}</td></tr>
+    <tr><th>お支払い合計額</th><td>{{total_payment}} 円</td></tr>
+    <tr data-show="interest"><th>うち利息</th><td>{{total_interest}} 円</td></tr>
+  </table>
+
+  <table class="schedule">
+    <thead>
+      <tr>
+        <th>回</th>
+        <th>支払月</th>
+        <th>お支払額</th>
+        <th data-show="bonus">うちボーナス加算</th>
+        <th>元本充当</th>
+        <th data-show="interest">利息</th>
+        <th>残高</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ROW_START -->
+      <tr>
+        <td class="c">{{row.no}}</td>
+        <td class="c">{{row.month}}</td>
+        <td>{{row.payment}}</td>
+        <td data-show="bonus">{{row.bonus}}</td>
+        <td>{{row.principal}}</td>
+        <td data-show="interest">{{row.interest}}</td>
+        <td>{{row.balance}}</td>
+      </tr>
+      <!-- ROW_END -->
+    </tbody>
+  </table>
+
+  <p class="note">{{note}}</p>
+</body>
+</html>
+`;
+  if (typeof module === 'object' && module.exports) module.exports = DEFAULT_TEMPLATE;
+  else root.DEFAULT_TEMPLATE = DEFAULT_TEMPLATE;
+})(typeof self !== 'undefined' ? self : this);
+</script>
+<script>
+/*
+ * 画面の処理。計算などのロジックは core.js（InstallmentCore）にある。
+ * 入力内容（患者名・支払総額など）はメモリ上だけに持ち、保存も送信もしない（仕様 9章）。
+ * 保存するのは設定だけ（このブラウザの localStorage）。
+ */
+(function () {
+  'use strict';
+
+  const C = window.InstallmentCore;
+  const DEFAULT_TEMPLATE = window.DEFAULT_TEMPLATE;
+  const STORAGE_KEY = 'installment-calculator.settings.v1';
+  const LOGO_MAX_BYTES = 800 * 1024;
+
+  const $ = (id) => document.getElementById(id);
+  const esc = C.escapeHTML;
+
+  // ---------------------------------------------------------------------------
+  // 状態
+
+  let settings = loadSettings();
+  let form = newForm();
+  let result = null;
+  let error = null;
+  /** 利息総額を見せているか。起動時と、入力を変えて結果が変わったときは伏せる */
+  let interestRevealed = false;
+  let lastResultKey = null;
+
+  function newForm() {
+    const f = C.emptyForm(settings.defaultBonusMonths);
+    f.rateText = settings.defaultRate;
+    return f;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 設定の保存
+
+  function loadSettings() {
+    try {
+      return C.normalizeSettings(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+    } catch {
+      return C.defaultSettings();
+    }
+  }
+
+  function saveSettings() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch (e) {
+      toast('設定を保存できませんでした。ロゴ画像やテンプレートが大きすぎないか確認してください。', true);
+    }
+  }
+
+  function updateSettings(patch) {
+    const before = settings;
+    settings = C.normalizeSettings({ ...settings, ...patch });
+    saveSettings();
+    applyTheme();
+    if (before.rounding !== settings.rounding || before.adjustment !== settings.adjustment) recalc();
+    else renderResult();
+    renderRateStatus();
+  }
+
+  // ---------------------------------------------------------------------------
+  // 見た目（設定 → CSS変数）
+
+  function applyTheme() {
+    const root = document.documentElement.style;
+    root.setProperty('--primary', settings.themeColor);
+    root.setProperty('--accent', settings.accentColor);
+    root.setProperty('--base', settings.baseFontSize + 'px');
+    root.setProperty('--result', settings.resultFontSize + 'px');
+    const name = settings.fontName.replace(/["';{}<>\\]/g, '').trim();
+    if (name) root.setProperty('--font', `"${name}", system-ui, -apple-system, "Hiragino Sans", sans-serif`);
+    else root.removeProperty('--font');
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', settings.themeColor);
+    $('note').textContent = settings.note;
+  }
+
+  // ---------------------------------------------------------------------------
+  // 計算
+
+  function recalc() {
+    let key;
+    if (!C.isFormReady(form)) {
+      result = null;
+      error = null;
+      key = 'empty';
+    } else {
+      try {
+        result = C.calculate(C.formToInput(form), settings);
+        error = null;
+        key = JSON.stringify(result, (k, v) => (typeof v === 'bigint' ? v.toString() : v));
+      } catch (e) {
+        if (!(e instanceof C.CalcError)) throw e;
+        result = null;
+        error = e;
+        key = 'error:' + e.code;
+      }
+    }
+    // 入力を変えて結果が変わったら、利息は自動で伏せ直す（仕様 5.3）
+    if (key !== lastResultKey) interestRevealed = false;
+    lastResultKey = key;
+    renderResult();
+  }
+
+  // ---------------------------------------------------------------------------
+  // 入力エリア
+
+  function monthButtons(container, selected, onChange) {
+    container.innerHTML = '';
+    for (let m = 1; m <= 12; m++) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = `${m}月`;
+      b.setAttribute('aria-pressed', String(selected.includes(m)));
+      b.addEventListener('click', () => {
+        const set = new Set(selected);
+        if (set.has(m)) set.delete(m); else set.add(m);
+        selected = [...set].sort((a, c) => a - c);
+        b.setAttribute('aria-pressed', String(set.has(m)));
+        onChange(selected);
+      });
+      container.appendChild(b);
+    }
+  }
+
+  function fillFirstMonthSelects() {
+    const current = C.nextMonth().year;
+    const years = [];
+    for (let y = Math.min(current - 1, form.firstMonth.year); y <= Math.max(current + 5, form.firstMonth.year); y++) years.push(y);
+    $('first-year').innerHTML = years.map((y) => `<option value="${y}">${y}年</option>`).join('');
+    $('first-month').innerHTML = Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1}月</option>`).join('');
+  }
+
+  /** form の内容を入力欄に反映する（起動時・クリア時） */
+  function renderForm() {
+    document.querySelectorAll('input[name="mode"]').forEach((r) => { r.checked = r.value === form.mode; });
+    $('principal').value = form.principalText;
+    $('rate').value = form.rateText;
+    $('installments').value = form.installmentsText;
+    $('payment').value = form.paymentText;
+    $('bonus-enabled').checked = form.bonusEnabled;
+    $('bonus-amount').value = form.bonusAmountText;
+    $('patient').value = form.patientName;
+    fillFirstMonthSelects();
+    $('first-year').value = String(form.firstMonth.year);
+    $('first-month').value = String(form.firstMonth.month);
+    monthButtons($('bonus-months'), form.bonusMonths, (months) => { form.bonusMonths = months; recalc(); });
+    renderModeFields();
+    renderRateStatus();
+  }
+
+  function renderModeFields() {
+    document.querySelectorAll('[data-mode]').forEach((el) => { el.hidden = el.dataset.mode !== form.mode; });
+    $('bonus-fields').hidden = !form.bonusEnabled;
+    $('payment-label').textContent = form.bonusEnabled ? '月額（ボーナスを除く）' : '月額';
+  }
+
+  /** 年率が既定値と違うときは強調して知らせる（仕様 7.2） */
+  function renderRateStatus() {
+    const differs = C.rateDiffersFromDefault(form.rateText, settings.defaultRate);
+    const field = $('rate').closest('.field');
+    field.classList.toggle('rate-differs', differs);
+    $('rate-message').textContent = differs
+      ? `⚠ 既定値（${settings.defaultRate}%）と異なります`
+      : '✓ 既定の年率';
+    $('rate-buttons').hidden = !differs;
+    $('btn-rate-default').disabled = C.rateForDefault(form.rateText) == null;
+  }
+
+  function bindInputs() {
+    const text = (id, key, after) => $(id).addEventListener('input', (e) => {
+      form[key] = e.target.value;
+      if (after) after();
+      recalc();
+    });
+    text('principal', 'principalText');
+    text('rate', 'rateText', renderRateStatus);
+    text('installments', 'installmentsText');
+    text('payment', 'paymentText');
+    text('bonus-amount', 'bonusAmountText');
+    // 患者名は計算に使わないので再計算しない（利息も伏せ直さない）
+    $('patient').addEventListener('input', (e) => { form.patientName = e.target.value; });
+
+    document.querySelectorAll('input[name="mode"]').forEach((r) => r.addEventListener('change', () => {
+      form.mode = r.value;
+      renderModeFields();
+      recalc();
+    }));
+    $('bonus-enabled').addEventListener('change', (e) => {
+      form.bonusEnabled = e.target.checked;
+      renderModeFields();
+      recalc();
+    });
+    const firstMonthChanged = () => {
+      form.firstMonth = { year: Number($('first-year').value), month: Number($('first-month').value) };
+      recalc();
+    };
+    $('first-year').addEventListener('change', firstMonthChanged);
+    $('first-month').addEventListener('change', firstMonthChanged);
+
+    $('btn-rate-reset').addEventListener('click', () => {
+      form.rateText = settings.defaultRate;
+      $('rate').value = form.rateText;
+      renderRateStatus();
+      recalc();
+    });
+    $('btn-rate-default').addEventListener('click', () => {
+      const value = C.rateForDefault(form.rateText);
+      if (value == null) return toast(new C.CalcError('invalidRate').message, true);
+      updateSettings({ defaultRate: value });
+      toast(`既定の年率を ${value}% にしました`);
+    });
+
+    $('btn-clear').addEventListener('click', () => {
+      const mode = form.mode;
+      form = newForm();
+      form.mode = mode;
+      interestRevealed = false;
+      renderForm();
+      recalc();
+      $('principal').focus();
+    });
+    $('btn-interest').addEventListener('click', () => {
+      interestRevealed = !interestRevealed;
+      renderResult();
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 結果エリア
+
+  function renderResult() {
+    $('error').hidden = !error;
+    $('error').textContent = error ? error.message : '';
+    $('result').hidden = !result;
+    $('placeholder').hidden = !!(result || error);
+    $('placeholder').textContent = `支払総額・年率・${form.mode === 'installments' ? '分割回数' : '月額'}を入力してください。`;
+    $('btn-export').disabled = !result;
+    if (!result) return;
+
+    const r = result;
+    const yen = C.formatYen;
+    if (form.mode === 'installments') {
+      $('main-caption').textContent = '月々のお支払い';
+      $('main-value').innerHTML = `${yen(r.monthlyPayment)}<span class="unit-l">円</span><span class="sub">× ${r.installments}回</span>`;
+    } else {
+      $('main-caption').textContent = 'お支払い回数';
+      $('main-value').innerHTML = `${r.installments}<span class="unit-l">回</span><span class="sub">（月々 ${yen(r.monthlyPayment)}円）</span>`;
+    }
+
+    const first = r.schedule[0];
+    const last = r.schedule[r.schedule.length - 1];
+    const rows = [['お支払い合計額', `${yen(r.totalPayment)}円`, 'big']];
+    const bonus = r.input.bonus;
+    if (bonus && r.totalBonus > 0) rows.push([`ボーナス月（${C.formatMonths(bonus.months)}）`, `月額 + ${yen(bonus.amount)}円`]);
+    if (r.installments > 1 && first.payment - first.bonus !== r.monthlyPayment) rows.push(['初回', `${yen(first.payment)}円`]);
+    if (r.installments > 1 && last.payment - last.bonus !== r.monthlyPayment) rows.push(['最終回', `${yen(last.payment)}円`]);
+    rows.push(['お支払い期間', `${C.formatMonth(first.month)} 〜 ${C.formatMonth(last.month)}`]);
+    $('summary').innerHTML = rows.map(([dt, dd, cls]) => `<dt>${esc(dt)}</dt><dd class="${cls || ''}">${esc(dd)}</dd>`).join('');
+
+    const mask = esc(settings.interestMask);
+    $('interest-value').textContent = interestRevealed ? `${yen(r.totalInterest)}円` : `${settings.interestMask}円`;
+    $('btn-interest').textContent = interestRevealed ? '利息総額を隠す' : '利息総額を表示';
+    $('btn-interest').setAttribute('aria-pressed', String(interestRevealed));
+
+    const showBonus = r.totalBonus > 0;
+    const head = `<thead><tr><th>回</th><th>支払月</th><th>支払額</th>${showBonus ? '<th>うちボーナス</th>' : ''}<th>元本充当</th><th>利息</th><th>残高</th></tr></thead>`;
+    const body = r.schedule.map((row) => `<tr${row.bonus > 0 ? ' class="bonus-row"' : ''}>`
+      + `<td>${row.no}</td><td>${C.formatMonth(row.month)}</td><td>${yen(row.payment)}</td>`
+      + (showBonus ? `<td>${row.bonus > 0 ? yen(row.bonus) : ''}</td>` : '')
+      + `<td>${yen(row.principal)}</td>`
+      + (interestRevealed ? `<td>${yen(row.interest)}</td>` : `<td class="masked">${mask}</td>`)
+      + `<td>${yen(row.balance)}</td></tr>`).join('');
+    $('schedule-table').innerHTML = head + '<tbody>' + body + '</tbody>';
+  }
+
+  // ---------------------------------------------------------------------------
+  // 支払い表の出力（仕様 6章）
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  function templateHTML(id) {
+    const custom = settings.templates.find((t) => t.id === id);
+    return custom ? custom.html : DEFAULT_TEMPLATE;
+  }
+
+  function templateOptions(select, selectedId) {
+    const options = [{ id: C.DEFAULT_TEMPLATE_ID, name: '既定のテンプレート' }, ...settings.templates];
+    select.innerHTML = options.map((t) => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('');
+    select.value = options.some((t) => t.id === selectedId) ? selectedId : C.DEFAULT_TEMPLATE_ID;
+  }
+
+  function renderPaymentTable() {
+    if (!result) return '';
+    const context = C.buildTemplateContext(result, settings, form.patientName.trim(), $('export-interest').checked);
+    return C.renderTemplate(templateHTML($('export-template').value), context);
+  }
+
+  function refreshPreview() {
+    $('export-preview').srcdoc = renderPaymentTable();
+  }
+
+  function openExport() {
+    if (!result) return;
+    templateOptions($('export-template'), settings.templateId);
+    $('export-interest').checked = false; // 利息は既定で出さない
+    $('print-hint').textContent = isIOS
+      ? '印刷画面で「プリント」を選ぶとAirPrintで印刷できます。PDFにするには、印刷画面の共有ボタン →「ファイルに保存」を選びます。'
+      : '印刷画面の「PDF」（Chromeは送信先「PDFに保存」）を選ぶとPDFで保存できます。保存先はその場で選べます。';
+    refreshPreview();
+    $('export-dialog').showModal();
+  }
+
+  function printPaymentTable() {
+    const html = renderPaymentTable();
+    if (isIOS) {
+      // iPad の Safari は iframe だけを印刷できないため、別のタブで開いて印刷する
+      const w = window.open('', '_blank');
+      if (!w) return toast('新しいタブを開けませんでした。ポップアップを許可してください。', true);
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      w.addEventListener('load', () => setTimeout(() => w.print(), 300));
+      setTimeout(() => { try { w.print(); } catch { /* 読み込み後の print に任せる */ } }, 1200);
+      return;
+    }
+    const frame = $('export-preview');
+    const doPrint = () => { frame.contentWindow.focus(); frame.contentWindow.print(); };
+    if (frame.srcdoc !== html) {
+      frame.addEventListener('load', doPrint, { once: true });
+      frame.srcdoc = html;
+    } else {
+      doPrint();
+    }
+  }
+
+  function openInNewTab() {
+    const url = URL.createObjectURL(new Blob([renderPaymentTable()], { type: 'text/html' }));
+    const w = window.open(url, '_blank');
+    if (!w) toast('新しいタブを開けませんでした。ポップアップを許可してください。', true);
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  }
+
+  function bindExport() {
+    $('btn-export').addEventListener('click', openExport);
+    $('export-template').addEventListener('change', refreshPreview);
+    $('export-interest').addEventListener('change', refreshPreview);
+    $('btn-print').addEventListener('click', printPaymentTable);
+    $('btn-open-tab').addEventListener('click', openInNewTab);
+    // 閉じたらプレビューを消す（患者名を画面に残さない）
+    $('export-dialog').addEventListener('close', () => { $('export-preview').srcdoc = ''; });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 設定画面（仕様 7章）
+
+  function renderSettingsForm() {
+    document.querySelectorAll('[data-setting]').forEach((el) => {
+      el.value = settings[el.dataset.setting];
+    });
+    document.querySelectorAll('[data-output]').forEach((el) => {
+      el.textContent = settings[el.dataset.output] + 'px';
+    });
+    $('setting-default-rate').value = settings.defaultRate;
+    $('logo-preview').hidden = !settings.logo;
+    $('btn-logo-remove').hidden = !settings.logo;
+    if (settings.logo) $('logo-preview').src = settings.logo; else $('logo-preview').removeAttribute('src');
+    templateOptions($('setting-template'), settings.templateId);
+    $('btn-template-delete').disabled = settings.templateId === C.DEFAULT_TEMPLATE_ID;
+    monthButtons($('default-bonus-months'), settings.defaultBonusMonths, (months) => updateSettings({ defaultBonusMonths: months }));
+  }
+
+  function download(filename, content, type) {
+    const url = URL.createObjectURL(new Blob([content], { type }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10_000);
+  }
+
+  function readFile(input, as) {
+    return new Promise((resolve, reject) => {
+      const file = input.files && input.files[0];
+      input.value = '';
+      if (!file) return reject(new Error('ファイルが選ばれていません'));
+      const reader = new FileReader();
+      reader.onload = () => resolve({ file, data: reader.result });
+      reader.onerror = () => reject(reader.error);
+      if (as === 'dataURL') reader.readAsDataURL(file); else reader.readAsText(file, 'utf-8');
+    });
+  }
+
+  function bindSettings() {
+    $('btn-settings').addEventListener('click', () => {
+      renderSettingsForm();
+      $('settings-dialog').showModal();
+    });
+
+    $('setting-rounding').innerHTML = Object.entries(C.ROUNDING_RULES).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+    $('setting-adjustment').innerHTML = Object.entries(C.ADJUSTMENTS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+
+    document.querySelectorAll('[data-setting]').forEach((el) => {
+      el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', () => {
+        const value = el.dataset.type === 'number' ? Number(el.value) : el.value;
+        updateSettings({ [el.dataset.setting]: value });
+        const out = document.querySelector(`[data-output="${el.dataset.setting}"]`);
+        if (out) out.textContent = value + 'px';
+      });
+    });
+
+    const saveDefaultRate = () => {
+      const value = C.rateForDefault($('setting-default-rate').value);
+      if (value == null) return toast(new C.CalcError('invalidRate').message, true);
+      updateSettings({ defaultRate: value });
+      $('setting-default-rate').value = value;
+      toast(`既定の年率を ${value}% にしました`);
+    };
+    $('btn-save-default-rate').addEventListener('click', saveDefaultRate);
+    $('setting-default-rate').addEventListener('keydown', (e) => { if (e.key === 'Enter') saveDefaultRate(); });
+
+    $('logo-file').addEventListener('change', async (e) => {
+      try {
+        const { file, data } = await readFile(e.target, 'dataURL');
+        if (file.size > LOGO_MAX_BYTES) return toast('画像が大きすぎます（800KBまで）。小さくしてから選んでください。', true);
+        updateSettings({ logo: data });
+        renderSettingsForm();
+      } catch (err) { toast('画像を読み込めませんでした: ' + err.message, true); }
+    });
+    $('btn-logo-remove').addEventListener('click', () => { updateSettings({ logo: '' }); renderSettingsForm(); });
+
+    $('setting-template').addEventListener('change', (e) => { updateSettings({ templateId: e.target.value }); renderSettingsForm(); });
+    $('template-file').addEventListener('change', async (e) => {
+      try {
+        const { file, data } = await readFile(e.target, 'text');
+        if (!data.includes(C.ROW_START)) toast('注意: テンプレートに <!-- ROW_START --> がないため、スケジュール表は出力されません。');
+        const existing = settings.templates.find((t) => t.name === file.name);
+        const id = existing ? existing.id : 't' + Date.now().toString(36);
+        const templates = settings.templates.filter((t) => t.id !== id).concat({ id, name: file.name, html: data });
+        updateSettings({ templates, templateId: id });
+        renderSettingsForm();
+        toast(`テンプレート「${file.name}」を読み込みました`);
+      } catch (err) { toast('テンプレートを読み込めませんでした: ' + err.message, true); }
+    });
+    $('btn-template-delete').addEventListener('click', () => {
+      const t = settings.templates.find((x) => x.id === settings.templateId);
+      if (!t || !confirm(`テンプレート「${t.name}」を削除しますか？`)) return;
+      updateSettings({ templates: settings.templates.filter((x) => x.id !== t.id), templateId: C.DEFAULT_TEMPLATE_ID });
+      renderSettingsForm();
+    });
+    $('btn-template-download').addEventListener('click', () => download('default.html', DEFAULT_TEMPLATE, 'text/html'));
+
+    $('btn-settings-export').addEventListener('click', () => {
+      download('installment-calculator-settings.json', JSON.stringify(settings, null, 2), 'application/json');
+    });
+    $('settings-file').addEventListener('change', async (e) => {
+      try {
+        const { data } = await readFile(e.target, 'text');
+        const raw = JSON.parse(data);
+        settings = C.normalizeSettings(raw);
+        saveSettings();
+        applyTheme();
+        form.rateText = settings.defaultRate;
+        $('rate').value = form.rateText;
+        renderSettingsForm();
+        renderRateStatus();
+        recalc();
+        toast('設定を読み込みました');
+      } catch (err) { toast('設定を読み込めませんでした: ' + err.message, true); }
+    });
+    $('btn-settings-reset').addEventListener('click', () => {
+      if (!confirm('設定を初期状態に戻しますか？（ロゴ・読み込んだテンプレートも消えます）')) return;
+      settings = C.defaultSettings();
+      saveSettings();
+      applyTheme();
+      renderSettingsForm();
+      renderRateStatus();
+      recalc();
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // 共通
+
+  let toastTimer;
+  function toast(message, isError = false) {
+    const el = $('toast');
+    el.textContent = message;
+    el.classList.toggle('error', isError);
+    el.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.hidden = true; }, isError ? 6000 : 3000);
+  }
+
+  document.querySelectorAll('dialog [data-close]').forEach((b) => b.addEventListener('click', () => b.closest('dialog').close()));
+  // 背景をクリックしたら閉じる
+  document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
+
+  applyTheme();
+  bindInputs();
+  bindExport();
+  bindSettings();
+  renderForm();
+  recalc();
+
+  // ホスティング（https）したときは、オフラインでも開けるようにする
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>
