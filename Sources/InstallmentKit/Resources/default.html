@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>お支払い予定表</title>
+<!--
+  既定のテンプレート。templates フォルダにコピーされるので、自由に編集できます。
+  使えるプレースホルダーや書き方は README の「支払い表テンプレート」を参照してください。
+-->
+<style>
+  @page { size: A4; margin: 14mm 12mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "{{font_family}}", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    color: #222; font-size: 10.5pt; margin: 0;
+  }
+  header { display: flex; align-items: center; justify-content: space-between;
+           border-bottom: 3px solid {{theme_color}}; padding-bottom: 6px; margin-bottom: 14px; }
+  header h1 { font-size: 18pt; margin: 0; color: {{theme_color}}; }
+  header .clinic { text-align: right; font-size: 11pt; }
+  header .clinic img { max-height: 40px; display: block; margin-left: auto; margin-bottom: 4px; }
+  .meta { display: flex; justify-content: space-between; margin-bottom: 12px; }
+  .patient { font-size: 14pt; border-bottom: 1px solid #999; padding: 0 24px 2px 0; margin: 0; }
+  .summary { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  .summary th, .summary td { border: 1px solid #bbb; padding: 6px 10px; }
+  .summary th { background: #f1f4f6; text-align: left; width: 30%; font-weight: normal; }
+  .summary td { text-align: right; font-size: 12pt; }
+  .summary .strong td { font-size: 15pt; font-weight: bold; color: {{theme_color}}; }
+  table.schedule { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  table.schedule th { background: {{theme_color}}; color: #fff; padding: 4px 6px; font-weight: normal; }
+  table.schedule td { border-bottom: 1px solid #ddd; padding: 3px 6px; text-align: right; }
+  table.schedule td.c { text-align: center; }
+  table.schedule tr { page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  .note { margin-top: 14px; font-size: 9pt; color: #555; border-left: 3px solid {{accent_color}}; padding-left: 8px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>お支払い予定表</h1>
+    <div class="clinic">
+      <img data-show="logo" src="{{logo}}" alt="">
+      {{clinic_name}}
+    </div>
+  </header>
+
+  <div class="meta">
+    <p class="patient" data-show="patient">{{patient_name}} 様</p>
+    <p>作成日: {{issue_date}}</p>
+  </div>
+
+  <table class="summary">
+    <tr><th>お支払総額（元本）</th><td>{{principal}} 円</td></tr>
+    <tr><th>年率</th><td>{{annual_rate}} %</td></tr>
+    <tr class="strong"><th>分割回数</th><td>{{installments}} 回</td></tr>
+    <tr class="strong"><th>月々のお支払い</th><td>{{monthly_payment}} 円</td></tr>
+    <tr data-show="bonus"><th>ボーナス月加算（{{bonus_months}}）</th><td>{{bonus_amount}} 円</td></tr>
+    <tr><th>お支払い期間</th><td>{{first_month}} 〜 {{last_month}}</td></tr>
+    <tr><th>お支払い合計額</th><td>{{total_payment}} 円</td></tr>
+    <tr data-show="interest"><th>うち利息</th><td>{{total_interest}} 円</td></tr>
+  </table>
+
+  <table class="schedule">
+    <thead>
+      <tr>
+        <th>回</th>
+        <th>支払月</th>
+        <th>お支払額</th>
+        <th data-show="bonus">うちボーナス加算</th>
+        <th>元本充当</th>
+        <th data-show="interest">利息</th>
+        <th>残高</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ROW_START -->
+      <tr>
+        <td class="c">{{row.no}}</td>
+        <td class="c">{{row.month}}</td>
+        <td>{{row.payment}}</td>
+        <td data-show="bonus">{{row.bonus}}</td>
+        <td>{{row.principal}}</td>
+        <td data-show="interest">{{row.interest}}</td>
+        <td>{{row.balance}}</td>
+      </tr>
+      <!-- ROW_END -->
+    </tbody>
+  </table>
+
+  <p class="note">{{note}}</p>
+</body>
+</html>
