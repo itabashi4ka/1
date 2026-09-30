@@ -1,6 +1,6 @@
 // オフラインでも開けるよう、アプリのファイルをキャッシュする。
 // ファイルを更新したら VERSION を上げること（古いキャッシュが消える）。
-const VERSION = 'v1';
+const VERSION = 'v2';
 const FILES = [
   './', 'index.html', 'css/app.css', 'js/core.js', 'js/default-template.js', 'js/app.js',
   'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png',

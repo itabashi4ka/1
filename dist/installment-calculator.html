@@ -123,16 +123,13 @@ input[type="checkbox"], input[type="radio"] { width: 22px; height: 22px; accent-
 .placeholder { color: var(--muted); font-size: 1.1em; padding: 60px 0; text-align: center; }
 .error { background: #fdecea; color: var(--danger); border-radius: 12px; padding: 14px 16px; font-weight: 600; }
 #result { display: grid; gap: 24px; }
-.main-figure { background: var(--soft); border-radius: 16px; padding: 20px 24px; color: var(--primary); }
-.main-caption { color: var(--muted); font-size: 1.1em; font-weight: 600; }
-.main-value { font-size: var(--result); font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.main-value .unit-l { font-size: .4em; font-weight: 600; margin-left: 4px; }
-.main-value .sub { font-size: .38em; font-weight: 600; color: var(--muted); margin-left: 10px; white-space: nowrap; }
-
-.summary { display: grid; grid-template-columns: auto 1fr; gap: 10px 24px; margin: 0; align-items: baseline; }
-.summary dt { color: var(--muted); }
-.summary dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
-.summary dd.big { font-size: calc(var(--result) * .45); }
+/* 計算結果（支払い表と同じ形の表） */
+.summary-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.summary-table th, .summary-table td { border: 1px solid var(--line); padding: 10px 16px; }
+.summary-table th { background: var(--soft); text-align: left; font-weight: normal; width: 38%; }
+.summary-table td { text-align: right; font-size: 1.15em; }
+.summary-table tr.strong td { font-weight: 700; }
+.summary-table tr.result td { font-weight: 700; color: var(--primary); font-size: calc(var(--result) * .6); line-height: 1.2; }
 
 .interest-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .interest-label { color: var(--muted); }
@@ -144,7 +141,6 @@ input[type="checkbox"], input[type="radio"] { width: 22px; height: 22px; accent-
 .schedule table { width: 100%; border-collapse: collapse; font-size: .85em; font-variant-numeric: tabular-nums; }
 .schedule th { color: var(--muted); font-weight: 600; text-align: right; padding: 6px 8px; border-bottom: 2px solid var(--line); white-space: nowrap; }
 .schedule td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-.schedule td.masked { color: var(--muted); }
 .schedule tr.bonus-row td { background: color-mix(in srgb, var(--accent) 7%, white); }
 
 .note { color: var(--muted); font-size: .85em; margin: 0; white-space: pre-wrap; }
@@ -265,12 +261,8 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
     <div class="placeholder" id="placeholder"></div>
 
     <div id="result" hidden>
-      <div class="main-figure">
-        <div class="main-caption" id="main-caption"></div>
-        <div class="main-value" id="main-value"></div>
-      </div>
-
-      <dl class="summary" id="summary"></dl>
+      <!-- 支払い表と同じ並び: 元本・年率・分割回数・月々のお支払い・お支払い期間・お支払い額合計 -->
+      <table class="summary-table" id="summary-table"></table>
 
       <div class="interest-row">
         <span class="interest-label">利息総額</span>
@@ -1320,36 +1312,35 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
 
     const r = result;
     const yen = C.formatYen;
-    if (form.mode === 'installments') {
-      $('main-caption').textContent = '月々のお支払い';
-      $('main-value').innerHTML = `${yen(r.monthlyPayment)}<span class="unit-l">円</span><span class="sub">× ${r.installments}回</span>`;
-    } else {
-      $('main-caption').textContent = 'お支払い回数';
-      $('main-value').innerHTML = `${r.installments}<span class="unit-l">回</span><span class="sub">（月々 ${yen(r.monthlyPayment)}円）</span>`;
-    }
-
     const first = r.schedule[0];
     const last = r.schedule[r.schedule.length - 1];
-    const rows = [['お支払い合計額', `${yen(r.totalPayment)}円`, 'big']];
     const bonus = r.input.bonus;
-    if (bonus && r.totalBonus > 0) rows.push([`ボーナス月（${C.formatMonths(bonus.months)}）`, `月額 + ${yen(bonus.amount)}円`]);
-    if (r.installments > 1 && first.payment - first.bonus !== r.monthlyPayment) rows.push(['初回', `${yen(first.payment)}円`]);
-    if (r.installments > 1 && last.payment - last.bonus !== r.monthlyPayment) rows.push(['最終回', `${yen(last.payment)}円`]);
-    rows.push(['お支払い期間', `${C.formatMonth(first.month)} 〜 ${C.formatMonth(last.month)}`]);
-    $('summary').innerHTML = rows.map(([dt, dd, cls]) => `<dt>${esc(dt)}</dt><dd class="${cls || ''}">${esc(dd)}</dd>`).join('');
 
-    const mask = esc(settings.interestMask);
+    // [見出し, 値, 強調の種類]  strong: 太字 / result: 太字・大きく（結果の文字サイズ）
+    const rows = [
+      ['元本', `${yen(r.input.principal)} 円`, 'strong'],
+      ['年率', `${C.formatRate(r.input.rate)} %`],
+      ['分割回数', `${r.installments} 回`, 'result'],
+      ['月々のお支払い', `${yen(r.monthlyPayment)} 円`, 'result'],
+    ];
+    if (bonus && r.totalBonus > 0) rows.push([`ボーナス月加算（${C.formatMonths(bonus.months)}）`, `${yen(bonus.amount)} 円`]);
+    rows.push(
+      ['お支払い期間', `${C.formatMonth(first.month)} 〜 ${C.formatMonth(last.month)}`],
+      ['お支払い額合計', `${yen(r.totalPayment)} 円`],
+    );
+    $('summary-table').innerHTML = '<tbody>' + rows.map(([th, td, cls]) =>
+      `<tr${cls ? ` class="${cls}"` : ''}><th scope="row">${esc(th)}</th><td>${esc(td)}</td></tr>`).join('') + '</tbody>';
+
     $('interest-value').textContent = interestRevealed ? `${yen(r.totalInterest)}円` : `${settings.interestMask}円`;
     $('btn-interest').textContent = interestRevealed ? '利息総額を隠す' : '利息総額を表示';
     $('btn-interest').setAttribute('aria-pressed', String(interestRevealed));
 
+    // 画面のスケジュール表は 回・支払月・支払額・（うちボーナス）・残高
     const showBonus = r.totalBonus > 0;
-    const head = `<thead><tr><th>回</th><th>支払月</th><th>支払額</th>${showBonus ? '<th>うちボーナス</th>' : ''}<th>元本充当</th><th>利息</th><th>残高</th></tr></thead>`;
+    const head = `<thead><tr><th>回</th><th>支払月</th><th>支払額</th>${showBonus ? '<th>うちボーナス</th>' : ''}<th>残高</th></tr></thead>`;
     const body = r.schedule.map((row) => `<tr${row.bonus > 0 ? ' class="bonus-row"' : ''}>`
       + `<td>${row.no}</td><td>${C.formatMonth(row.month)}</td><td>${yen(row.payment)}</td>`
       + (showBonus ? `<td>${row.bonus > 0 ? yen(row.bonus) : ''}</td>` : '')
-      + `<td>${yen(row.principal)}</td>`
-      + (interestRevealed ? `<td>${yen(row.interest)}</td>` : `<td class="masked">${mask}</td>`)
       + `<td>${yen(row.balance)}</td></tr>`).join('');
     $('schedule-table').innerHTML = head + '<tbody>' + body + '</tbody>';
   }

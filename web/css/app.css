@@ -108,16 +108,13 @@ input[type="checkbox"], input[type="radio"] { width: 22px; height: 22px; accent-
 .placeholder { color: var(--muted); font-size: 1.1em; padding: 60px 0; text-align: center; }
 .error { background: #fdecea; color: var(--danger); border-radius: 12px; padding: 14px 16px; font-weight: 600; }
 #result { display: grid; gap: 24px; }
-.main-figure { background: var(--soft); border-radius: 16px; padding: 20px 24px; color: var(--primary); }
-.main-caption { color: var(--muted); font-size: 1.1em; font-weight: 600; }
-.main-value { font-size: var(--result); font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.main-value .unit-l { font-size: .4em; font-weight: 600; margin-left: 4px; }
-.main-value .sub { font-size: .38em; font-weight: 600; color: var(--muted); margin-left: 10px; white-space: nowrap; }
-
-.summary { display: grid; grid-template-columns: auto 1fr; gap: 10px 24px; margin: 0; align-items: baseline; }
-.summary dt { color: var(--muted); }
-.summary dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
-.summary dd.big { font-size: calc(var(--result) * .45); }
+/* 計算結果（支払い表と同じ形の表） */
+.summary-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.summary-table th, .summary-table td { border: 1px solid var(--line); padding: 10px 16px; }
+.summary-table th { background: var(--soft); text-align: left; font-weight: normal; width: 38%; }
+.summary-table td { text-align: right; font-size: 1.15em; }
+.summary-table tr.strong td { font-weight: 700; }
+.summary-table tr.result td { font-weight: 700; color: var(--primary); font-size: calc(var(--result) * .6); line-height: 1.2; }
 
 .interest-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .interest-label { color: var(--muted); }
@@ -129,7 +126,6 @@ input[type="checkbox"], input[type="radio"] { width: 22px; height: 22px; accent-
 .schedule table { width: 100%; border-collapse: collapse; font-size: .85em; font-variant-numeric: tabular-nums; }
 .schedule th { color: var(--muted); font-weight: 600; text-align: right; padding: 6px 8px; border-bottom: 2px solid var(--line); white-space: nowrap; }
 .schedule td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-.schedule td.masked { color: var(--muted); }
 .schedule tr.bonus-row td { background: color-mix(in srgb, var(--accent) 7%, white); }
 
 .note { color: var(--muted); font-size: .85em; margin: 0; white-space: pre-wrap; }
