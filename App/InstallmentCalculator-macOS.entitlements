@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- App Sandbox -->
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<!-- PDFの保存先・テンプレート・設定ファイルを利用者が選んで読み書きする -->
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
+	<!-- 印刷 -->
+	<key>com.apple.security.print</key>
+	<true/>
+	<!-- WKWebView（支払い表の描画）の動作に必要。外部への通信は行わない -->
+	<key>com.apple.security.network.client</key>
+	<true/>
+</dict>
+</plist>
