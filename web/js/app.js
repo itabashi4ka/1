@@ -21,9 +21,6 @@
   let form = newForm();
   let result = null;
   let error = null;
-  /** 利息総額を見せているか。起動時と、入力を変えて結果が変わったときは伏せる */
-  let interestRevealed = false;
-  let lastResultKey = null;
 
   function newForm() {
     const f = C.emptyForm(settings.defaultBonusMonths);
@@ -80,26 +77,16 @@
   // 計算
 
   function recalc() {
-    let key;
-    if (!C.isFormReady(form)) {
-      result = null;
-      error = null;
-      key = 'empty';
-    } else {
+    result = null;
+    error = null;
+    if (C.isFormReady(form)) {
       try {
         result = C.calculate(C.formToInput(form), settings);
-        error = null;
-        key = JSON.stringify(result, (k, v) => (typeof v === 'bigint' ? v.toString() : v));
       } catch (e) {
         if (!(e instanceof C.CalcError)) throw e;
-        result = null;
         error = e;
-        key = 'error:' + e.code;
       }
     }
-    // 入力を変えて結果が変わったら、利息は自動で伏せ直す（仕様 5.3）
-    if (key !== lastResultKey) interestRevealed = false;
-    lastResultKey = key;
     renderResult();
   }
 
@@ -216,14 +203,9 @@
       const mode = form.mode;
       form = newForm();
       form.mode = mode;
-      interestRevealed = false;
       renderForm();
       recalc();
       $('principal').focus();
-    });
-    $('btn-interest').addEventListener('click', () => {
-      interestRevealed = !interestRevealed;
-      renderResult();
     });
   }
 
@@ -245,9 +227,9 @@
     const last = r.schedule[r.schedule.length - 1];
     const bonus = r.input.bonus;
 
-    // [見出し, 値, 強調の種類]  strong: 太字 / result: 太字・大きく（結果の文字サイズ）
+    // [見出し, 値, 強調]  result: 太字・大きく（結果の文字サイズ）
     const rows = [
-      ['元本', `${yen(r.input.principal)} 円`, 'strong'],
+      ['元本', `${yen(r.input.principal)} 円`, 'result'],
       ['年率', `${C.formatRate(r.input.rate)} %`],
       ['分割回数', `${r.installments} 回`, 'result'],
       ['月々のお支払い', `${yen(r.monthlyPayment)} 円`, 'result'],
@@ -259,10 +241,6 @@
     );
     $('summary-table').innerHTML = '<tbody>' + rows.map(([th, td, cls]) =>
       `<tr${cls ? ` class="${cls}"` : ''}><th scope="row">${esc(th)}</th><td>${esc(td)}</td></tr>`).join('') + '</tbody>';
-
-    $('interest-value').textContent = interestRevealed ? `${yen(r.totalInterest)}円` : `${settings.interestMask}円`;
-    $('btn-interest').textContent = interestRevealed ? '利息総額を隠す' : '利息総額を表示';
-    $('btn-interest').setAttribute('aria-pressed', String(interestRevealed));
 
     // 画面のスケジュール表は 回・支払月・支払額・（うちボーナス）・残高
     const showBonus = r.totalBonus > 0;

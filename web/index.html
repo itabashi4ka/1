@@ -95,12 +95,6 @@
       <!-- 支払い表と同じ並び: 元本・年率・分割回数・月々のお支払い・お支払い期間・お支払い額合計 -->
       <table class="summary-table" id="summary-table"></table>
 
-      <div class="interest-row">
-        <span class="interest-label">利息総額</span>
-        <strong class="interest-value" id="interest-value"></strong>
-        <button type="button" id="btn-interest"></button>
-      </div>
-
       <details class="schedule" open>
         <summary>お支払いスケジュール</summary>
         <div class="table-wrap">
@@ -161,7 +155,6 @@
     <fieldset>
       <legend>文言</legend>
       <label class="stack">注記文（画面下部と支払い表に表示） <textarea rows="2" data-setting="note"></textarea></label>
-      <label class="row">利息を伏せるときの表示 <input type="text" data-setting="interestMask"></label>
     </fieldset>
 
     <fieldset>

@@ -128,13 +128,8 @@ input[type="checkbox"], input[type="radio"] { width: 22px; height: 22px; accent-
 .summary-table th, .summary-table td { border: 1px solid var(--line); padding: 10px 16px; }
 .summary-table th { background: var(--soft); text-align: left; font-weight: normal; width: 38%; }
 .summary-table td { text-align: right; font-size: 1.15em; }
-.summary-table tr.strong td { font-weight: 700; }
 .summary-table tr.result td { font-weight: 700; color: var(--primary); font-size: calc(var(--result) * .6); line-height: 1.2; }
 
-.interest-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.interest-label { color: var(--muted); }
-.interest-value { font-size: 1.1em; font-variant-numeric: tabular-nums; }
-#btn-interest { margin-left: auto; }
 
 .schedule summary { cursor: pointer; font-weight: 600; font-size: 1.1em; min-height: var(--tap); display: flex; align-items: center; }
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -264,12 +259,6 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
       <!-- 支払い表と同じ並び: 元本・年率・分割回数・月々のお支払い・お支払い期間・お支払い額合計 -->
       <table class="summary-table" id="summary-table"></table>
 
-      <div class="interest-row">
-        <span class="interest-label">利息総額</span>
-        <strong class="interest-value" id="interest-value"></strong>
-        <button type="button" id="btn-interest"></button>
-      </div>
-
       <details class="schedule" open>
         <summary>お支払いスケジュール</summary>
         <div class="table-wrap">
@@ -330,7 +319,6 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
     <fieldset>
       <legend>文言</legend>
       <label class="stack">注記文（画面下部と支払い表に表示） <textarea rows="2" data-setting="note"></textarea></label>
-      <label class="row">利息を伏せるときの表示 <input type="text" data-setting="interestMask"></label>
     </fieldset>
 
     <fieldset>
@@ -894,7 +882,6 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
       baseFontSize: 17,
       resultFontSize: 56,
       note: '概算です。実際の条件は契約内容によります。',
-      interestMask: '●●●',
       rounding: 'down',
       adjustment: 'last',
       defaultRate: '0', // 既定の年率（%、文字列で正確に保持）
@@ -912,7 +899,7 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
     const str = (k) => { if (typeof raw[k] === 'string') s[k] = raw[k]; };
     const num = (k, min, max) => { if (typeof raw[k] === 'number' && raw[k] >= min && raw[k] <= max) s[k] = raw[k]; };
     const color = (k) => { if (typeof raw[k] === 'string' && /^#[0-9a-fA-F]{6}$/.test(raw[k])) s[k] = raw[k]; };
-    ['clinicName', 'fontName', 'note', 'interestMask'].forEach(str);
+    ['clinicName', 'fontName', 'note'].forEach(str);
     if (typeof raw.logo === 'string' && (raw.logo === '' || raw.logo.startsWith('data:image/'))) s.logo = raw.logo;
     color('themeColor');
     color('accentColor');
@@ -1023,7 +1010,7 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
   </div>
 
   <table class="summary">
-    <tr><th>お支払総額（元本）</th><td>{{principal}} 円</td></tr>
+    <tr class="strong"><th>お支払総額（元本）</th><td>{{principal}} 円</td></tr>
     <tr><th>年率</th><td>{{annual_rate}} %</td></tr>
     <tr class="strong"><th>分割回数</th><td>{{installments}} 回</td></tr>
     <tr class="strong"><th>月々のお支払い</th><td>{{monthly_payment}} 円</td></tr>
@@ -1040,8 +1027,6 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
         <th>支払月</th>
         <th>お支払額</th>
         <th data-show="bonus">うちボーナス加算</th>
-        <th>元本充当</th>
-        <th data-show="interest">利息</th>
         <th>残高</th>
       </tr>
     </thead>
@@ -1052,8 +1037,6 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
         <td class="c">{{row.month}}</td>
         <td>{{row.payment}}</td>
         <td data-show="bonus">{{row.bonus}}</td>
-        <td>{{row.principal}}</td>
-        <td data-show="interest">{{row.interest}}</td>
         <td>{{row.balance}}</td>
       </tr>
       <!-- ROW_END -->
@@ -1092,9 +1075,6 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
   let form = newForm();
   let result = null;
   let error = null;
-  /** 利息総額を見せているか。起動時と、入力を変えて結果が変わったときは伏せる */
-  let interestRevealed = false;
-  let lastResultKey = null;
 
   function newForm() {
     const f = C.emptyForm(settings.defaultBonusMonths);
@@ -1151,26 +1131,16 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
   // 計算
 
   function recalc() {
-    let key;
-    if (!C.isFormReady(form)) {
-      result = null;
-      error = null;
-      key = 'empty';
-    } else {
+    result = null;
+    error = null;
+    if (C.isFormReady(form)) {
       try {
         result = C.calculate(C.formToInput(form), settings);
-        error = null;
-        key = JSON.stringify(result, (k, v) => (typeof v === 'bigint' ? v.toString() : v));
       } catch (e) {
         if (!(e instanceof C.CalcError)) throw e;
-        result = null;
         error = e;
-        key = 'error:' + e.code;
       }
     }
-    // 入力を変えて結果が変わったら、利息は自動で伏せ直す（仕様 5.3）
-    if (key !== lastResultKey) interestRevealed = false;
-    lastResultKey = key;
     renderResult();
   }
 
@@ -1287,14 +1257,9 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
       const mode = form.mode;
       form = newForm();
       form.mode = mode;
-      interestRevealed = false;
       renderForm();
       recalc();
       $('principal').focus();
-    });
-    $('btn-interest').addEventListener('click', () => {
-      interestRevealed = !interestRevealed;
-      renderResult();
     });
   }
 
@@ -1316,9 +1281,9 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
     const last = r.schedule[r.schedule.length - 1];
     const bonus = r.input.bonus;
 
-    // [見出し, 値, 強調の種類]  strong: 太字 / result: 太字・大きく（結果の文字サイズ）
+    // [見出し, 値, 強調]  result: 太字・大きく（結果の文字サイズ）
     const rows = [
-      ['元本', `${yen(r.input.principal)} 円`, 'strong'],
+      ['元本', `${yen(r.input.principal)} 円`, 'result'],
       ['年率', `${C.formatRate(r.input.rate)} %`],
       ['分割回数', `${r.installments} 回`, 'result'],
       ['月々のお支払い', `${yen(r.monthlyPayment)} 円`, 'result'],
@@ -1330,10 +1295,6 @@ input[type="color"] { width: 64px; height: 40px; border: 1px solid var(--line); 
     );
     $('summary-table').innerHTML = '<tbody>' + rows.map(([th, td, cls]) =>
       `<tr${cls ? ` class="${cls}"` : ''}><th scope="row">${esc(th)}</th><td>${esc(td)}</td></tr>`).join('') + '</tbody>';
-
-    $('interest-value').textContent = interestRevealed ? `${yen(r.totalInterest)}円` : `${settings.interestMask}円`;
-    $('btn-interest').textContent = interestRevealed ? '利息総額を隠す' : '利息総額を表示';
-    $('btn-interest').setAttribute('aria-pressed', String(interestRevealed));
 
     // 画面のスケジュール表は 回・支払月・支払額・（うちボーナス）・残高
     const showBonus = r.totalBonus > 0;

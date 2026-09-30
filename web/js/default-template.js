@@ -58,7 +58,7 @@
   </div>
 
   <table class="summary">
-    <tr><th>お支払総額（元本）</th><td>{{principal}} 円</td></tr>
+    <tr class="strong"><th>お支払総額（元本）</th><td>{{principal}} 円</td></tr>
     <tr><th>年率</th><td>{{annual_rate}} %</td></tr>
     <tr class="strong"><th>分割回数</th><td>{{installments}} 回</td></tr>
     <tr class="strong"><th>月々のお支払い</th><td>{{monthly_payment}} 円</td></tr>
@@ -75,8 +75,6 @@
         <th>支払月</th>
         <th>お支払額</th>
         <th data-show="bonus">うちボーナス加算</th>
-        <th>元本充当</th>
-        <th data-show="interest">利息</th>
         <th>残高</th>
       </tr>
     </thead>
@@ -87,8 +85,6 @@
         <td class="c">{{row.month}}</td>
         <td>{{row.payment}}</td>
         <td data-show="bonus">{{row.bonus}}</td>
-        <td>{{row.principal}}</td>
-        <td data-show="interest">{{row.interest}}</td>
         <td>{{row.balance}}</td>
       </tr>
       <!-- ROW_END -->

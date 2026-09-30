@@ -519,7 +519,6 @@
       baseFontSize: 17,
       resultFontSize: 56,
       note: '概算です。実際の条件は契約内容によります。',
-      interestMask: '●●●',
       rounding: 'down',
       adjustment: 'last',
       defaultRate: '0', // 既定の年率（%、文字列で正確に保持）
@@ -537,7 +536,7 @@
     const str = (k) => { if (typeof raw[k] === 'string') s[k] = raw[k]; };
     const num = (k, min, max) => { if (typeof raw[k] === 'number' && raw[k] >= min && raw[k] <= max) s[k] = raw[k]; };
     const color = (k) => { if (typeof raw[k] === 'string' && /^#[0-9a-fA-F]{6}$/.test(raw[k])) s[k] = raw[k]; };
-    ['clinicName', 'fontName', 'note', 'interestMask'].forEach(str);
+    ['clinicName', 'fontName', 'note'].forEach(str);
     if (typeof raw.logo === 'string' && (raw.logo === '' || raw.logo.startsWith('data:image/'))) s.logo = raw.logo;
     color('themeColor');
     color('accentColor');
